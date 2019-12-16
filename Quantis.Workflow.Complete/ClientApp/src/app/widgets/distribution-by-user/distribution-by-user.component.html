@@ -1,0 +1,14 @@
+<p class="float-left no-drag">
+  <input type="text" *ngIf="isDashboardModeEdit" [(ngModel)]="widgetname" (ngModelChange)="widgetnameChange($event)" />
+  <span *ngIf="!isDashboardModeEdit"> {{ widgetname }}</span>
+</p>
+<button type="button" [disabled]="loading" *ngIf="!isDashboardModeEdit" class="no-drag btn-sm btn btn-primary float-right mr-1" (click)="openModal()">
+  <i class="fa fa-cog"></i>
+</button>
+<div class="clearfix"></div>
+<div class="spinner-grow text-primary" *ngIf="loading" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div style="display: block; position:relative">
+  <canvas id="chart" baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+</div>

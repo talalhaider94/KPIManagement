@@ -1,0 +1,104 @@
+<div style="margin-top: -20px;">
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br />
+        <h2 style="color:#565656">Free Form Report</h2><br>
+        <button class="btn btn-success" data-toggle="modal"
+                data-target="#addConfigModal" (click)="showAddConfigModal()">
+            Nuovo Gruppo
+        </button><br /><br />
+        <table class="table stripe" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+            <thead class="thead-light2">
+                <tr style="font-size:12px;color:white">
+                    <th style="text-align:center">HANDLE</th>
+                    <th style="text-align:center">NOME</th>
+                    <th style="text-align:center">STEP</th>
+                    <th style="text-align:center">CONTRAENTE</th>
+                    <th style="text-align:center">AZIONE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of ConfigTableBodyData; index as i">
+                    <td style="text-align:center">{{row.handle}}</td>
+                    <td style="text-align:center">{{row.name}}</td>
+                    <td style="text-align:center">{{row.step}}</td>
+                    <td style="text-align:center">{{row.category_name}}</td>
+                    <td style="text-align: center">
+                        <button class="btn btn-primary" data-toggle="modal" (click)="populateModalData(row)"
+                                data-target="#configModal" style="font-size:10px">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger" [swal]="{title: 'Conferma', text: 'Eliminare il Gruppo?', confirmButtonClass: 'btn btn-danger', showCancelButton: true, cancelButtonText: 'Annulla', confirmButtonText: 'Elimina'  }"
+                                (confirm)="deleteSDMRow(row)" (cancel)="onCancel($event)"
+                                style="font-size:10px">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="configModal" bsModal #configModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Modifica Gruppo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideConfigModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="classTable" class="table table-bordered">
+                    <thead class="thead-light2">
+                    </thead>
+                    <tbody>
+                        <tr><th>HANDLE</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.handle"></td></tr>
+                        <tr><th>NOME</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.name"></td></tr>
+                        <tr><th>STEP</th><td colspan="2"><input type="number" class="form-control" [(ngModel)]="modalData.step"></td></tr>
+                        <tr>
+                            <th>CONTRAENTE</th>
+                            <td colspan="2">
+                                <select [(ngModel)]="modalData.category_id" class="form-control">
+                                    <option *ngFor="let obj of customersKP; index as i" [value]="obj.key">{{obj.value}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button (click)="updateConfig()" class="btn btn-success">Aggiorna</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideConfigModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="addConfigModal" bsModal #addConfigModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Nuovo Gruppo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideAddConfigModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label><b>Handle</b></label><input type="text" class="form-control" placeholder="Handle" [(ngModel)]="handle" /><br>
+                <label><b>Nome</b></label><input type="text" class="form-control" placeholder="Nome" [(ngModel)]="name" /><br>
+                <label><b>Step</b></label><input type="text" class="form-control" placeholder="Step" [(ngModel)]="step" /><br>
+                <label><b>Contraente</b></label>
+                <select [(ngModel)]="category_id" class="form-control">
+                    <option *ngFor="let obj of customersKP; index as i" [value]="obj.key">{{obj.value}}</option>
+                </select><br>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" (click)="add()">Aggiungi</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideAddConfigModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>

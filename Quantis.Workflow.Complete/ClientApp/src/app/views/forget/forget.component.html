@@ -1,0 +1,45 @@
+<div class="app-body">
+    <main class="main d-flex align-items-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 mx-auto">
+                    <div class="card-group">
+                        <div class="card p-4">
+                            <div class="card-body">
+                                <form [formGroup]="forgetForm" (ngSubmit)="onForgetFormSubmit()">
+                                    <h1>{{title}}</h1>
+                                    <p class="text-muted">Inserisci username e email per cambiare la tua password</p>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="icon-user"></i></span>
+                                        </div>
+                                        <input type="text" formControlName="userName" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.userName.errors }" placeholder="Username" autocomplete="userName">
+                                    </div>
+                                    <span class="text-danger mb-3" *ngIf="submitted && f.userName.errors && f.userName.errors.required">Username è obbligatorio</span>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">@</span>
+                                        </div>
+                                        <input type="text" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" placeholder="Email" autocomplete="email">
+                                    </div>
+                                    <span class="text-danger mb-3" *ngIf="submitted && f.email.errors && f.email.errors.required">Email è obbligatoria</span>
+                                    <span class="text-danger mb-3" *ngIf="submitted && f.email.errors && f.email.errors.email">L'Email deve essere un indirizzo valido</span>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <button [disabled]="loading" type="submit" class="btn btn-primary px-4">
+                                                <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Invia
+                                            </button>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <a routerLink="/login" class="btn btn-link px-0">Ritorna al Login?</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

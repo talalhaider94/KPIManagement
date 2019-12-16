@@ -1,0 +1,242 @@
+<div class="card" id="widgetsList">
+  <div class="card-header py-2">
+    <div class="row align-items-center">
+      <div class="col-6">
+        <b>{{dashboardName}}</b>
+      </div>
+      <div class="col-6 text-right">
+        <a [routerLink]="['/dashboard/dashboard', dashboardId]" class="btn btn-primary btn-sm">
+          <i class="fa fa-edit"></i>
+        </a>
+        <button class="btn btn-success btn-sm" (click)="saveDashboardState()"><i class="fa fa-save"></i> Salva</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Gridster grid -->
+<gridster [options]="options" class="bg-white">
+  <!-- Earch grister-item is generated with *ngFor -->
+  <gridster-item [item]="item" *ngFor="let item of dashboardWidgetsArray">
+    <div class="card">
+      <div class="card-body">
+        <ndc-dynamic class="no-drag" [ndcDynamicComponent]="item.component" [ndcDynamicInputs]="item" [ndcDynamicOutputs]="outputs" (ndcDynamicCreated)="componentCreated($event)">
+        </ndc-dynamic>
+      </div>
+    </div>
+  </gridster-item>
+</gridster>
+<!-- modal start -->
+<div bsModal #widgetParametersModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-body" *ngIf="barChartWidgetParameters">
+        <p>
+          <strong>Widget:</strong> {{barChartWidgetParameters.widgetname}}
+        </p>
+        <form [formGroup]="widgetParametersForm" (ngSubmit)="onWidgetParametersFormSubmit()">
+          <tabset>
+            <!-- PROPERTIES -->
+            <tab heading="PROPRIETA" id="tab1">
+              <div *ngIf="loadingFiltersDropDown" class="text-center">
+                <span class="fa fa-spinner text-primary fa-2x fa-spin"></span>
+              </div>
+              <div formGroupName="Properties">
+                <div class="form-group" *ngIf="barChartWidgetParameters.showcharttype">
+                  <label for="charttype">Typo di Grafico</label>
+                  <!-- Chart Type -->
+                  <select class="form-control" id="charttype" formControlName="charttype">
+                    <option *ngFor="let type of barChartWidgetParameters.charttypes | keyvalue; let i = index"
+                            [attr.selected]="!i" [ngValue]="type.key">
+                      {{ type.value }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group" *ngIf="barChartWidgetParameters.showaggregationoption">
+                  <label for="aggregationoption">Aggregazioni</label>
+                  <!-- Aggregations -->
+                  <select class="form-control" id="aggregationoption" formControlName="aggregationoption">
+                    <option *ngFor="let option of barChartWidgetParameters.aggregationoptions | keyvalue; let i = index"
+                            [ngValue]="option.key" [attr.selected]="!i">
+                      {{ option.value }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group" *ngIf="barChartWidgetParameters.showmeasure">
+                  <label for="measure">Le misure</label>
+                  <!-- Measure -->
+                  <select class="form-control" id="measure" formControlName="measure" (change)="reportParametersDropDown($event)">
+                    <option *ngFor="let measure of barChartWidgetParameters.measures | keyvalue; let i = index"
+                            [attr.selected]="!i" [ngValue]="measure.key">
+                      {{ measure.value }}
+                    </option>
+                  </select>
+                </div>
+                <div formArrayName="parameters" *ngFor="let item of widgetParametersForm.get('Properties').get('parameters').controls; let i = index;">
+                  <div [formGroupName]="i" class="form-row">
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label for="key">Key</label>
+                        <input class="form-control" formControlName="key" placeholder="key" />
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label for="value">Value</label>
+                        <input class="form-control" formControlName="value" placeholder="value" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </tab>
+            <!-- FILTERS -->
+            <tab heading="FILTRI">
+              <div *ngIf="loadingFiltersDropDown" class="text-center">
+                <span class="fa fa-spinner text-primary fa-2x fa-spin"></span>
+              </div>
+              <div formGroupName="Filters">
+                <span *ngIf="barChartWidgetParameters.showorganization">
+                  <label>Contraente e Contratto</label>
+                  <perfect-scrollbar style="max-height: 260px;">
+                    <ejs-treeview #organizationTree id="organizationTreeId" [fields]='treeDataFields'
+                                  [showCheckBox]='true' [checkedNodes]="preSelectedNodes"
+                                  (nodeChecked)='organizationTreeNodeCheckEvent($event)'
+                                  (nodeSelected)='organizationTreeNodeSelected($event)'>
+                    </ejs-treeview>
+                  </perfect-scrollbar>
+                </span>
+                <span *ngIf="barChartWidgetParameters.allContractParties">
+                  <div class="form-group">
+                    <label for="contractParties">Contract Parties</label>
+                    <select class="form-control" formControlName="contractParties"
+                            (change)="contractPartiesDropDown($event)">
+                      <option [selected]="!i" *ngFor="let org of allContractParties; let i = index"
+                              [value]="allContractParties[i].key">
+                        {{ allContractParties[i].value }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="contracts">Contracts</label><!-- Date Type -->
+                    <select class="form-control" formControlName="contracts" (change)="contractsDropDown($event)">
+                      <option [selected]="!i" *ngFor="let contract of filterContracts; let i = index"
+                              [value]="filterContracts[i].key">
+                        {{ filterContracts[i].value }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="kpi">KPI's</label><!-- Date Type -->
+                    <select class="form-control" formControlName="kpi">
+                      <option [selected]="!i" *ngFor="let kpi of filterKpis; let i = index" [value]="filterKpis[i].key">
+                        {{ filterKpis[i].value }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="form-group form-check">
+                    <input type="checkbox" formControlName="groupReportCheck" class="form-check-input"
+                           id="groupReportCheck">
+                    <label class="form-check-label" for="groupReportCheck">Group Report</label>
+                  </div>
+                  <span *ngIf="groupReportCheck">
+                    <div class="form-group">
+                      <label for="contractParties1">Contract Parties</label>
+                      <select class="form-control" formControlName="contractParties1"
+                              (change)="contractPartiesDropDown1($event)">
+                        <option [selected]="!i" *ngFor="let org of allContractParties1; let i = index"
+                                [value]="allContractParties1[i].key">
+                          {{ allContractParties1[i].value }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="contracts1">Contracts</label><!-- Date Type -->
+                      <select class="form-control" formControlName="contracts1" (change)="contractsDropDown1($event)">
+                        <option [selected]="!i" *ngFor="let contract of filterContracts1; let i = index"
+                                [value]="filterContracts1[i].key">
+                          {{ filterContracts1[i].value }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="kpi1">KPI's</label><!-- Date Type -->
+                      <select class="form-control" formControlName="kpi1">
+                        <option [selected]="!i" *ngFor="let kpi of filterKpis1; let i = index"
+                                [value]="filterKpis1[i].key">
+                          {{ filterKpis1[i].value }}
+                        </option>
+                      </select>
+                    </div>
+                  </span>
+                </span>
+                <div class="form-group form-check" *ngIf="!barChartWidgetParameters.showincompleteperiodcheck">
+                  <input type="checkbox" formControlName="incompletePeriod" class="form-check-input" id="incompletePeriod">
+                  <label class="form-check-label" for="incompletePeriod">Periodo incompleto</label>
+                </div>
+                <div class="form-group">
+                  <label for="dateTypes">Tipi di data</label>
+                  <!-- Date Type -->
+                  <select class="form-control" id="dateTypes" formControlName="dateTypes" (change)="customDateTypes($event)">
+                    <option *ngFor="let datetype of barChartWidgetParameters.datetypes | keyvalue; let i = index"
+                            [attr.selected]="!i" [ngValue]="datetype.key">
+                      {{ datetype.value }}
+                    </option>
+                  </select>
+                </div>
+                <span *ngIf="showDateRangeInFilters">
+                  <div class="form-group" *ngIf="barChartWidgetParameters.showdaterangefilter">
+                    <!-- Date Range = Start Date - End Date -->
+                    <label for="daterange">Tipo di intervallo</label>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <label for="startDate">Da</label>
+                        <input type="text" formControlName="startDate" class="form-control" placeholder="Start Date"
+                               bsDatepicker
+                               [bsConfig]="{dateInputFormat: 'MM/YYYY',minMode: 'month', adaptivePosition: true}" />
+                      </div>
+                      <div class="col-md-6">
+                        <label for="endDate">A</label>
+                        <input type="text" formControlName="endDate" class="form-control" placeholder="End Date"
+                               bsDatepicker
+                               [bsConfig]="{dateInputFormat: 'MM/YYYY',minMode: 'month', adaptivePosition: true}" />
+                      </div>
+                    </div>
+                  </div>
+                </span>
+                <div class="form-group" *ngIf="barChartWidgetParameters.showdatefilter">
+                  <label for="date">Seleziona la data</label>
+                  <!-- Select Date -->
+                  <input type="text" formControlName="date" placeholder="Pick Date" class="form-control" bsDatepicker [bsConfig]="{ dateInputFormat: 'MM/YYYY', minMode: 'month' }">
+                </div>
+              </div>
+            </tab>
+            <!-- HELP -->
+            <tab heading="AIUTO">
+              {{ helpText }}
+            </tab>
+            <!-- NOTE -->
+            <tab heading="NOTA">
+              <textarea placeholder="Enter Note" class="form-control">
+
+                </textarea>
+            </tab>
+          </tabset>
+          <div class="row justify-content-end mt-3">
+            <div class="col-6 text-right">
+              <!-- Apply -->
+              <button type="submit" class="btn btn-outline-primary btn-sm px-4">
+                <span *ngIf="loadingModalForm" class="fa fa-spinner fa-spin"></span>
+                Applica
+              </button>
+              <!-- Cancel -->
+              <a (click)="widgetParametersModal.hide()" role="button" class="btn btn-primary pointer-cursor btn-sm px-4">
+                Annulla
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- modal end -->

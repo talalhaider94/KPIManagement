@@ -1,0 +1,30 @@
+<div style="margin-top: -20px;">
+  <div class="table-responsive" style="background: #ffffff; padding: 10px">
+    <br>
+    <h2 style="color:#565656">View Standard Dashboard</h2><br>
+    <div class="row">
+      <!-- <input type="text" class="form-control ml-3" style="width:10%;" placeholder="Chiave" #searchCol1 /> -->
+      <button style="margin-left:93%" class="btn btn-success" (click)="savePermissions()">
+        Salva
+      </button>
+    </div><br />
+    <table class="table stripe" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+      <thead class="thead-light2">
+        <tr style="font-size:12px;color:white">
+          <th style="text-align:center">NAME</th>
+          <th style="text-align:center">USERNAME</th>
+          <th style="text-align:center">ORGANIZATION</th>
+          <th style="text-align:center">ASSIGNED</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of ConfigTableBodyData; index as i">
+          <td style="text-align:center">{{row.name}} {{row.surname}}</td>
+          <td style="text-align:center">{{row.ca_bsi_account}}</td>
+          <td style="text-align:center">{{row.organization}}</td>
+          <td style="text-align:center"><input type="checkbox" [checked]="row.show_landingpage" (change)="save(row,$event)" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

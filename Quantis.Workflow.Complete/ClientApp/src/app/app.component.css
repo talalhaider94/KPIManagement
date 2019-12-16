@@ -1,0 +1,7 @@
+.class-version-nav {
+    margin-bottom: auto;
+}
+
+body > app-dashboard > div > main > cui-breadcrumb > ol > li > a {
+    pointer-events: none;
+}

@@ -1,0 +1,15 @@
+:host {
+    gridster {
+        height: calc(100vh + 200px);
+        // display: flex;
+        // flex-direction: column;
+    }
+}
+
+.card {
+    border: 0px solid #c8ced3 !important;
+}
+
+gridster-item {
+    border: 1px solid #c8ced3;
+}

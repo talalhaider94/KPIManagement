@@ -1,0 +1,98 @@
+input:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.col-form-label {
+    border-right: 1px solid #ccc;
+}
+
+.mat-form-field-wrapper {
+    padding: 0 !important;
+}
+
+.card .mat-form-field {
+    width: 100% !important;
+    height: 57px;
+}
+
+.card .mat-form-field .mat-form-field-wrapper {
+    padding: 0 !important;
+}
+
+.fa-download {
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+
+    &:hover {
+        cursor: not-allowed;
+    }
+}
+
+.file-container {
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.my-custom-file-field {
+    color: transparent;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.my-custom-file-field::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+.my-custom-file-field::before {
+    content: 'Scegliere i file';
+    color: white;
+    display: inline-block;
+    background: #1985ac;
+    border: 2px solid #1985ac;
+    border-radius: 3px;
+    padding: 5px 8px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    // text-shadow: 1px 1px #fff;
+    font-weight: 700;
+    font-size: 10pt;
+}
+
+.my-custom-file-field:hover::before {
+    border-color: #1985ac;
+    cursor: pointer;
+}
+
+.my-custom-file-field:active {
+    outline: 0;
+}
+
+.my-custom-file-field:active::before {
+    background: #1985ac;
+}
+
+.disable-datepicker {
+    background: #e4e7ea;
+
+    &:hover {
+        pointer-events: none;
+    }
+
+    input {
+        &:hover {
+            pointer-events: none;
+        }
+    }
+}

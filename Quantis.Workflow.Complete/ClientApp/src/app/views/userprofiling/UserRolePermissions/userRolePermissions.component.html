@@ -1,0 +1,43 @@
+<div style="margin-top: -25px; padding: 10px">
+    <!-- <h2 style="color:#565656">User Roles</h2><br> -->
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br>
+        <h2 style="color:#565656">Ruoli Utente</h2>
+        <br>
+        <div class="row role-permissions-lists col-md-12">
+            <div class="col-md-4">
+                <div>
+                    <label class="lbl-filter-user">
+                        Utenti: <strong class="selected-user-title">{{selectedData.name|uppercase}}</strong>
+                    </label>
+                </div>
+                <div class="txt-filter-user-div">
+                    <input type="text" class="form-control" placeholder="Cerca"
+                           [(ngModel)]="filters.searchUsersText" />
+                </div>
+                <perfect-scrollbar style="max-height: 546px;">
+
+                    <ul class="users-list">
+                        <h5 *ngIf="loading.users" class="text-center text-primary loader" style="color:#eedc00 !important">
+                            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento..
+                        </h5>
+                        <li *ngFor="let user of gatheredData.usersList | filter : filters.searchUsersText; index as i" class="tagsTip" data-html="true" style="white-space: pre-line;" attr.data-ext="Dominio: {{user.userid}} &#013;&#010; Nome: {{user.name}}  {{user.surname}} &#013;&#010; BSI: {{user.ca_bsi_account}}&#013;&#010; Email: {{user.mail}} &#013;&#010; Manager: {{user.manager}} &#013;&#010; Organizzazione: {{user.organization}}"
+                            (click)="selectUserItem(user, $event)">{{user.userid}} - {{user.name}} {{user.surname}} [{{user.ca_bsi_account}}]</li>
+                    </ul>
+                </perfect-scrollbar>
+            </div>
+            <div class="col-md-8">
+                <dual-list [source]="gatheredData.rolesList" key="id" display="name" [(destination)]="selectedRoles"
+                           filter="true" (destinationChange)="onRoleSelectDeselect($event)" height="500px"
+                           [disabled]="loading.roles" [format]="format"></dual-list>
+                <div>
+                    <br><button (click)="saveAssignedRoles()" class="btn btn-success pull-right"
+                                [disabled]="!selectedData.userid">
+                        Salva
+                    </button>
+                </div>
+            </div>
+        </div>
+        <br />
+    </div>
+</div>

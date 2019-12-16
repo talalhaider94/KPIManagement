@@ -1,0 +1,103 @@
+<div>
+    <!--    <h2 style="color:#565656">Catalogo</h2><br>-->
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br>
+        <h2 style="color:#565656">LISTA UTENTI</h2><br>
+        <div class="row">
+            <input type="text" class="form-control ml-3 mr-1" style="width:20%;" placeholder="Nome" #searchCol1
+                   [(ngModel)]="viewModel.filters.nome" />
+            <input type="text" class="form-control ml-1 mr-3" style="width:20%;" placeholder="Cognome" #searchCol2
+                   [(ngModel)]="viewModel.filters.cognome" />
+            <!--          <button #btnFilter class="mr-2" style="padding-left: 25px; padding-right: 25px">FILTRA</button>-->
+            <button #btnExportCSV style="padding-left: 25px; padding-right: 25px">Esporta CSV</button>
+        </div><br />
+        <table class="table stripe kpiTable" #kpiTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+            <thead class="thead-light2">
+                <tr style="font-size:12px; color:white">
+                    <th style="text-align:center">USER ID</th>
+                    <th style="text-align:center">BSI ACCOUNT</th>
+                    <th style="text-align:center">NOME</th>
+                    <th style="text-align:center">COGNOME</th>
+                    <th style="text-align:center">STRUTTURA</th>
+                    <th style="text-align:center">MAIL</th>
+                    <th style="text-align:center">USER DOMAIN ID</th>
+                    <th style="text-align:center">RESPONSABILE</th>
+                    <th class="notExportCsv" style="text-align:center">AZIONE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of UtentiTableBodyData; index as i" style="font-size:13px">
+                    <td style="text-align:center">{{row.ca_bsi_user_id}}</td>
+                    <td style="text-align:center">{{row.ca_bsi_account}}</td>
+                    <td style="text-align:center">{{row.name}}</td>
+                    <td style="text-align:center">{{row.surname}}</td>
+                    <td style="text-align:center">{{row.organization}}</td>
+                    <td style="text-align:center">{{row.mail}}</td>
+                    <td style="text-align:center">{{row.userid}}</td>
+                    <td style="text-align:center">{{row.manager}}</td>
+                    <td class="notExportCsv" align="center">
+                        <button style="font-size:10px" class="btn btn-primary btn-sm" data-toggle="modal" (click)="populateModalData(row)"
+                                data-target="#utentiModal" (click)="showModal()">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="utentiModal" bsModal #successModal="bs-modal" class="modal fade bs-example-modal-lg"
+     style="width:100% !important" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!--        <h5 class="modal-title" id="approveModalLabel">Giustificativo</h5>-->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-->div class="table-responsive" style="background: #ffffff; padding: 10px"-->
+                <table id="classTable" class="table table-bordered">
+                    <thead class="thead-light2">
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>BSI ACCOUNT</th>
+                            <td>{{modalData.ca_bsi_account}}</td>
+                        </tr>
+                        <tr>
+                            <th>NOME</th>
+                            <td><input type="text" class="form-control" [(ngModel)]="modalData.name"></td>
+                        </tr>
+                        <tr>
+                            <th>COGNOME</th>
+                            <td><input type="text" class="form-control" [(ngModel)]="modalData.surname"></td>
+                        </tr>
+                        <tr>
+                            <th>STRUTTURA</th>
+                            <td><input type="text" class="form-control" [(ngModel)]="modalData.organization"></td>
+                        </tr>
+                        <tr>
+                            <th>MAIL</th>
+                            <td><input type="text" class="form-control" [(ngModel)]="modalData.mail"></td>
+                        </tr>
+                        <tr>
+                            <th>USER DOMAIN ID</th>
+                            <td><input type="text" class="form-control" [(ngModel)]="modalData.userid"></td>
+                        </tr>
+                        <tr>
+                            <th>RESPONSABILE</th>
+                            <td><input type="text" class="form-control" [(ngModel)]="modalData.manager"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--div-->
+            </div>
+            <div class="modal-footer">
+                <button (click)="updateUtenti()" class="btn btn-success">Aggiorna</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>

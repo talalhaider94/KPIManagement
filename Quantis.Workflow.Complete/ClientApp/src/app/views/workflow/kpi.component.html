@@ -1,0 +1,525 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row justify-content-around">
+                        <div class="col-sm-6 mb-3">
+                            <button type="button" [disabled]="allTickets.length === 0" class="btn btn-danger mr-2"
+                                    data-toggle="modal" (click)="rejectTicket()">
+                                Rifiuta
+                            </button>
+                            <button type="button" [disabled]="allTickets.length === 0" class="btn btn-success"
+                                    data-toggle="modal" (click)="approveTicket()">
+                                Approva
+                            </button>
+                        </div>
+                        <div class="col-sm-5 ml-auto">
+                            <div class="row">
+                                <div class="form-group col-sm-4">
+                                    <label for="yearOption"><strong>Stato KPI</strong></label>
+                                    <select #statoKPISelect class="form-control" name="statoKPIOption"
+                                            [(ngModel)]="statoKPIOption">
+                                        <option value="" selected>Tutti</option>
+                                        <option value="[Compliant]">Compliant</option>
+                                        <option value="[Non Compliant]">Non Compliant</option>
+                                        <option value="[NE]">NE</option>
+                                        <!--option value="[Nessun Evento]">Nessun Evento</option-->
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <label for="monthOption"><strong>Mese</strong></label>
+                                    <select #monthSelect class="form-control" name="monthOption"
+                                            [(ngModel)]="monthOption" (change)="onDataChange()">
+                                        <option value="01">1</option>
+                                        <option value="02">2</option>
+                                        <option value="03">3</option>
+                                        <option value="04">4</option>
+                                        <option value="05">5</option>
+                                        <option value="06">6</option>
+                                        <option value="07">7</option>
+                                        <option value="08">8</option>
+                                        <option value="09">9</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <label for="yearOption"><strong>Anno</strong></label>
+                                    <select #yearSelect class="form-control" name="yearOption" [(ngModel)]="yearOption"
+                                            (change)="onDataChange()">
+                                        <option value="16">2016</option>
+                                        <option value="18">2017</option>
+                                        <option value="18">2018</option>
+                                        <option value="19">2019</option>
+                                        <option value="20">2020</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="">
+                        <div *ngIf="loading" class="text-center">
+                            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                        </div>
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                               class="table-responsive kpi-table table table-responsive-sm table-hover table-outline mb-0 text-center">
+
+                            <thead class="thead-light2">
+                                <tr>
+                                    <th>
+                                        <label class="checkbox-container checkbox-container-default border border-primary">
+                                            <input type="checkbox" [(ngModel)]="selectedAll" (change)="selectAll();">
+                                            <span class="checkbox-checkmark"></span>
+                                        </label>
+                                    </th>
+                                    <th>Sommario</th>
+                                    <th>Rif. Num</th>
+                                    <th>Titolo</th>
+                                    <th>KPI ID</th>
+                                    <th>Tipologia</th>
+                                    <th>Gruppo</th>
+                                    <th>Stato</th>
+                                    <th>Periodo</th>
+                                    <th>Target</th>
+                                    <th>Valore</th>
+                                    <th>Rif Input</th>
+                                    <th>Ref. Op. </th>
+                                    <th>Ref. Ser.</th>
+                                    <th>Resp. Contratto/Disciplinare</th>
+                                    <th>Azioni</th>
+                                    <th>Allegati</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--tr *ngIf="allTickets.length === 0 && !loading">
+                                    <td colspan="17"><strong>Nessun Ticket Trovato.</strong></td>
+                                </tr -->
+                                <tr *ngFor="let ticket of allTickets; let i = index"
+                                    [ngClass]="{'bg-secondary': ticket.isclosed}">
+                                  <ng-template #popCheckBox>
+                                    <ul class="list-group list-group-flush" *ngFor="let obj of formatCheckColumn()">
+                                      <li class="list-group-item">
+                                        {{ obj }}
+                                      </li>
+                                    </ul>
+                                  </ng-template>
+
+                                  <td class="pl-3" [popover]="popCheckBox" triggers="hover" placement="right">
+                                    <label class="checkbox-container border"
+                                           [ngClass]="ticket.description.includes('[Compliant]') ?
+                                             'checkbox-container-success border-success' : ticket.description.includes('[Non Compliant]') ?
+                                              'checkbox-container-danger border-danger' : ticket.description.includes('[NE]') ?
+                                              'checkbox-container-default border-secondary' : ticket.description.includes('[Nessun Evento]') ? 'checkbox-container-primary border-primary' : 'checkbox-container-white border-white' ">
+                                      <input type="checkbox" [disabled]="ticket.isclosed"
+                                             [(ngModel)]="ticket.selected" (change)="checkIfAllSelected();">
+                                      <span class="checkbox-checkmark"></span>
+                                    </label>
+                                  </td>
+                                    <td>
+                                        <ng-template #popSummary>
+                                            <ul class="list-group list-group-flush"
+                                                *ngFor="let obj of formatSummaryColumn(ticket.summary)">
+                                                <li class="list-group-item">
+                                                    {{ obj }}
+                                                </li>
+                                            </ul>
+                                        </ng-template>
+                                        <button type="button" class="btn btn-ghost-dark" [popover]="popSummary"
+                                                triggers="focus">
+                                            {{ ticket.summary | slice:0:15 || 'N/A' }}
+                                            <span class="d-none">
+                                                {{ ticket.summary | slice:15 || 'N/A' }}
+                                            </span>
+                                        </button>
+                                    </td>
+                                    <td>{{ ticket.ref_num || 'N/A' }}</td>
+
+                                    <td>
+                                        <button type="button" class="btn btn-ghost-dark" [popover]="ticket.titolo"
+                                                triggers="focus">
+                                            {{ ticket.titolo | slice:0:15 || 'N/A' }}
+                                            <span class="d-none">
+                                                {{ ticket.titolo | slice:15 || 'N/A' }}
+                                            </span>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <ng-template #popTemplate>
+                                            <ul class="list-group list-group-flush"
+                                                *ngFor="let obj of formatDescriptionColumn(ticket.description)">
+                                                <li *ngIf="obj.key" class="list-group-item">
+                                                    <b>{{obj.key}}</b> {{obj.value}}
+                                                </li>
+                                                <li *ngIf="!obj.key" class="list-group-item">
+                                                    {{obj}}
+                                                </li>
+                                            </ul>
+                                        </ng-template>
+
+                                        <button type="button" class="btn btn-ghost-dark" [popover]="popTemplate"
+                                                triggers="focus" placement="top">
+                                            {{ ticket.id_kpi || 'N/A' }}
+                                            <span class="d-none">
+                                                {{ ticket.description | slice:15 || 'N/A' }}
+                                            </span>
+                                        </button>
+                                    </td>
+                                    <td>{{ ticket.tipologia  }}</td>
+
+                                    <td>
+                                        <button type="button" class="btn btn-ghost-dark" [popover]="ticket.group"
+                                                triggers="focus">
+                                            {{ ticket.group | slice:0:15 || 'N/A' }}
+                                        </button>
+                                    </td>
+                                    <td>{{ ticket.status || 'N/A' }}</td>
+                                    <td>{{ ticket.period || 'N/A' }}</td>
+                                    <td>
+                                      <div *ngFor="let obj of formatDescriptionColumn(ticket.description)">
+                                          <span *ngIf="obj.key == 'TARGET:'">
+                                            {{obj.value || 'N/A'}}
+                                          </span>
+                                      </div>
+
+                                    </td>
+                                    <td>
+                                      <div *ngFor="let obj of formatDescriptionColumn(ticket.description)">
+                                          <span *ngIf="obj.key == 'VALORE:'">
+                                            {{obj.value || 'N/A'}}
+                                          </span>
+                                      </div>
+                                    </td>
+                                    <td>{{ ticket.reference_input || 'N/A' }}</td>
+                                    <td>
+                                        <div *ngIf="ticket.reference1; else reference1">
+                                            <button type="button" class="btn btn-ghost-dark"
+                                                    [popover]="ticket.reference1" triggers="focus">
+                                                {{ ticket.reference1 | slice:0:15 }}
+                                            </button>
+                                        </div>
+                                        <ng-template #reference1>
+                                            N/A
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="ticket.reference2; else reference2">
+                                            <button type="button" class="btn btn-ghost-dark"
+                                                    [popover]="ticket.reference2" triggers="focus">
+                                                {{ ticket.reference2 | slice:0:15 }}
+                                            </button>
+                                        </div>
+                                        <ng-template #reference2>
+                                            N/A
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="ticket.reference3; else reference3">
+                                            <button type="button" class="btn btn-ghost-dark"
+                                                    [popover]="ticket.reference3" triggers="focus">
+                                                {{ ticket.reference3 | slice:0:15 }}
+                                            </button>
+                                        </div>
+                                        <ng-template #reference3>
+                                            N/A
+                                        </ng-template>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                                (click)="ticketActions(ticket)">
+                                            <span class="fa fa-calendar"></span>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                                (click)="ticketAttachments(ticket)">
+                                            <span class="fa fa-archive"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/.col-->
+    </div>
+    <!--/.row-->
+</div>
+<div bsModal #successModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-success modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Attivita eseguite sul KPI</h4>
+                <button type="button" class="close" (click)="successModal.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- success model body table -->
+                <div class="table-responsive">
+                    <table class="table table-responsive-sm table-hover table-outline mb-0 text-center">
+                        <thead class="thead-light2">
+                            <tr>
+                                <th>DataOra</th>
+                                <th>Azione</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="getTicketHistories.length === 0 && !loading">
+                                <td colspan="2"><strong>Nessun ticket trovato.</strong></td>
+                            </tr>
+                            <tr *ngIf="loading" class="text-center">
+                                <td colspan="2">
+                                    <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                                </td>
+                            </tr>
+                            <tr *ngFor="let history of getTicketHistories; let i = index">
+                                <td>{{ history.timestamp*1000 | date: 'dd/MM/yyyy, h:mm a' }}</td>
+                                <td>{{ history.description }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- success model body table end -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="successModal.hide()">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div bsModal #infoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-info modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Allegati</h4>
+                <button type="button" class="close" (click)="infoModal.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- file upload start -->
+                <div class="bg-white pt-2 pb-2 mb-5">
+                    <div class="col-sm-12 mb-3 file-container">
+                        <h5>File Allegati</h5>
+                        <input type="file" class="my-custom-file-field" ng2FileSelect [uploader]="uploader"
+                               multiple /><br />
+                    </div>
+
+                    <div class="col-sm-12">
+                        <h5>Elenco dei File</h5>
+                        <table class="table table-responsive-sm table-hover table-outline mb-3">
+                            <thead class="thead-light2">
+                                <tr>
+                                    <th>Nome File</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="uploader.queue.length === 0">
+                                    <td colspan="2">Nessun file da caricare</td>
+                                </tr>
+                                <tr *ngFor="let item of uploader.queue">
+                                    <td>{{ item?.file?.name }}</td>
+                                    <td nowrap>
+                                        <button type="button" class="btn btn-danger btn-sm" (click)="item.remove()">
+                                            <span class="fa fa-trash"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" [disabled]="fileUploading" class="btn btn-primary"
+                                (click)="fileUploadUI()">
+                            <span class="fa fa-upload" *ngIf="!fileUploading"></span>
+                            <span class="fa fa-spinner fa-spin" *ngIf="fileUploading"></span> Carica
+                        </button>
+                    </div>
+                </div>
+                <!-- file upload end -->
+                <!-- success model body table -->
+                <div class="table-responsive">
+                    <table class="table table-responsive-sm table-hover table-outline mb-0 text-center">
+                        <thead class="thead-light2">
+                            <tr>
+                                <th>Allegato</th>
+                                <th>Caricato il</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="getTicketAttachments.length === 0 && !loading">
+                                <td colspan="3"><strong>Nessun allegato.</strong></td>
+                            </tr>
+                            <tr *ngIf="loading" class="text-center">
+                                <td colspan="3">
+                                    <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                                </td>
+                            </tr>
+                            <tr *ngFor="let attachment of getTicketAttachments; let i = index">
+                                <td>{{ attachment.attachmentname }}</td>
+                                <td>{{ attachment.lastmodifieddate*1000 | date: 'dd/MM/yyyy, h:mm a' }}</td>
+                                <td>
+                                    <a class="download-link"
+                                       (click)="downloadFile(attachment.attachmentname, attachment.attachmenthandle)">
+                                        <i class="fa fa-download text-primary"></i>
+                                    </a>
+                                    <!-- <a href="data:image/png;base64,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" target="_blank" download><i class="fa fa-download"></i></a> -->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- success model body table end -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="infoModal.hide()">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- APPROVE MODAL HTML START -->
+<div bsModal #approveModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-success modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Approva</h4>
+                <button type="button" class="close" (click)="approveModal.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- APPROVE model body -->
+                <form [formGroup]="approveForm" (ngSubmit)="approveFormSubmit()">
+                    <div class="input-group mb-3">
+                        <textarea formControlName="description" class="form-control" placeholder="Descrizione"
+                                  autocomplete="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <button [disabled]="loading" type="submit" class="btn btn-primary px-4">
+                                <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Invia
+                            </button>
+                            <button type="button" class="btn btn-secondary" (click)="approveModal.hide()">Close</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- APPROVE model body end -->
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- APPROVE MODAL HTML END -->
+<!-- REJECT MODAL HTML START -->
+<div bsModal #rejectModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-danger modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rifiuta</h4>
+                <button type="button" class="close" (click)="rejectModal.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- REJECT model body -->
+                <form [formGroup]="rejectForm" (ngSubmit)="rejectFormSubmit()">
+                    <div class="input-group mb-3">
+                        <textarea formControlName="description" class="form-control"
+                                  [ngClass]="{ 'is-invalid': submitted && rejectValues.description.errors }"
+                                  placeholder="Descrizione" autocomplete="description" rows="3"></textarea>
+                    </div>
+                    <!-- display description error -->
+                    <span class="text-danger mb-3"
+                          *ngIf="submitted && rejectValues.description.errors && rejectValues.description.errors.required">
+                        Giustificativo
+                        obbligatorio
+                    </span>
+                    <div class="row">
+                        <div class="col-6">
+                            <button [disabled]="loading" type="submit" class="btn btn-primary px-4">
+                                <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Invia
+                            </button>
+                            <button type="button" class="btn btn-secondary" (click)="rejectModal.hide()">Close</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- REJECT model body end -->
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- REJECT MODAL HTML END -->
+<!-- TICKETS STATUS MODAL START -->
+<div bsModal #ticketStatusModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tickets Status</h4>
+                <button type="button" class="close" (click)="ticketStatusModal.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- TICKETS STATUS model body -->
+                <div *ngIf="loading" class="text-center mb-2">
+                    <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-responsive-sm table-hover table-outline text-center">
+                        <tr>
+                            <th>No.</th>
+                            <th>Rif. Num</th>
+                            <th>SDM</th>
+                            <th>Stato</th>
+                        </tr>
+                        <tbody>
+                            <tr *ngIf="ticketsStatus.length === 0 && !loading">
+                                <td colspan="5"><strong>No Tickets approved.</strong></td>
+                            </tr>
+                            <tr *ngFor="let status of ticketsStatus; let i = index">
+                                <td>
+                                    <div>{{ i+1 }} / {{ selectedTickets.length }}</div>
+                                </td>
+                                <td>
+                                    <div>{{ status.ticket.ref_num }}</div>
+                                </td>
+                                <td>
+                                    <i class="fa fa-square"
+                                       [ngClass]="status.result.issdmstatuschanged ? 'text-success' : 'text-danger' "></i>
+                                </td>
+                                <td>
+                                    <div>{{ status.ticket.status }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- TICKETS STATUS model body end -->
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- TICKETS STATUS MODAL END -->

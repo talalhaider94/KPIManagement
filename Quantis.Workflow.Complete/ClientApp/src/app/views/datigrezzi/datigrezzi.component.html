@@ -1,0 +1,276 @@
+<div style="margin-top: -25px; padding: 10px">
+    <br />
+    <div class="table-responsive" style="background: #ffffff; padding: 5px">
+        <br><h2 style="color:#565656">Dati Grezzi</h2><br>
+        <div class="row">
+            <input type="text" class="form-control ml-3 mr-1" style="width:15%;" placeholder="ID KPI" #searchCol1 [(ngModel)]="viewModel.filters.idKpi" name="idKpi" />
+            <input type="text" class="form-control ml-1 mr-1" style="width:15%;" placeholder="Titolo Breve" #searchCol2 [(ngModel)]="viewModel.filters.titoloBreve" name="titoloBreve" />
+            <span>&nbsp;&nbsp;</span>
+            <select class="form-control" style="width:15%;" #searchCol4 [(ngModel)]="viewModel.filters.tuttiContratti" name="tuttiContratti"><option value="">Tutti i Contratti</option></select>
+            <span>&nbsp;&nbsp;</span>
+            <select class="form-control" style="width:15%;" #searchCol5 [(ngModel)]="viewModel.filters.tutteLeFrequenze" name="tutteLeFrequenze">
+                <option value="">Tutte le Frequenze</option>
+                <option value="MENSILE">MENSILE</option>
+                <option value="TRIMESTRALE">TRIMESTRALE</option>
+                <option value="QUADRIMESTRALE">QUADRIMESTRALE</option>
+                <option value="SEMESTRALE">SEMESTRALE</option>
+                <option value="ANNUALE">ANNUALE</option>
+            </select>
+        </div><br />
+        <h5 *ngIf="loading" class="text-center text-primary" style="color:#eedc00 !important">
+            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+        </h5>
+        <table class="table stripe" #kpiTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+            <thead class="thead-light2">
+                <tr style="color:white;font-size:12px;">
+                    <th style="text-align:center">CONTRATTO</th>
+                    <th style="text-align:center">ID</th>
+                    <th style="text-align:center">TITOLO BREVE</th>
+                    <th width="50%" style="text-align:center">KPI</th>
+                    <th style="text-align:center">FREQUENZA</th>
+                    <th width="10%" style="text-align:center"></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr *ngFor="let row of kpiTableBodyData; index as i" style="font-size:13px">
+                    <td [ngClass]="isNumber(row.contract_name) ? 'rightAlign' : 'leftAlign'">{{row.contract_name}}</td>
+                    <td [ngClass]="isNumber(row.id_kpi) ? 'rightAlign' : 'leftAlign'">{{row.id_kpi}}</td>
+                    <td [ngClass]="isNumber(row.short_name) ? 'rightAlign' : 'leftAlign'">{{row.short_name}}</td>
+                    <td class="tagsTip" width="50%" [ngClass]="isNumber(row.kpi_name_bsi) ? 'rightAlign' : 'leftAlign'" data-ext="" attr.data-ext="{{row.kpi_name_bsi}}">{{row.kpi_name_bsi | slice:0:130}} [...]</td>
+                    <td [ngClass]="isNumber(row.tracking_period) ? 'rightAlign' : 'leftAlign'">{{row.tracking_period}}</td>
+                    <td width="10%" align="center">
+                        <button style="font-size:10px" class="btn btn-primary" data-toggle="modal" (click)="setId(row.global_rule_id_bsi)" data-target="#searchModal" title="Search">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        <!-- <button style="font-size:10px" class="btn btn-primary ml-1" data-toggle="modal" (click)="getdati1(row.global_rule_id_bsi,monthVar,yearVar)" data-target="#daModal" title="DATI"><i class="fa fa-table"></i>
+                        </button> -->
+                        <button style="font-size:10px" class="btn btn-primary" data-toggle="modal" (click)="getdati1(row.global_rule_id_bsi,monthVar,yearVar)" data-target="#daModal" title="DATI">
+                            <i class="fa fa-table"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="searchModal" bsModal #searchModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">DATI</h5><br><br>
+
+                <button type="button" class="close" (click)="clear()" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br>
+            <h5 *ngIf='loadingModalDati' id="loader" class="text-center">
+                <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+            </h5>
+
+            <div class="modal-body">
+                <h4 style="color:#565656;">Periodo:</h4>
+                <div class="row">
+
+                    <select [(ngModel)]="monthVar" class="form-control ml-3" style="width:15%;">
+                        <option value="01">Gennaio</option>
+                        <option value="02">Febbraio</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Aprile</option>
+                        <option value="05">Maggio</option>
+                        <option value="06">Giugno</option>
+                        <option value="07">Luglio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Settembre</option>
+                        <option value="10">Ottobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Dicembre</option>
+                    </select>
+                    <select [(ngModel)]="yearVar" class="form-control ml-1" style="width:15%;">
+                        <option value="">Anno</option>
+                        <option *ngFor="let year of anni">{{year}}</option>
+                    </select>
+                    <button type="button" class="btn btn-primary ml-2" (click)="getdati1(this.idKpi,monthVar,yearVar)">Apply</button>
+                </div>
+                <br><br>
+
+                <div class="row" [hidden]="periodFilter!==1">
+                    <input class="form-control" style="width: 18%;margin-left:22px" type="text" name="search" [(ngModel)]="filter" placeholder="Cerca">
+                    <button (click)="fireEvent()" style="margin-left:20%">Esporta CSV</button>
+                </div>
+                <div class="table-responsive" [hidden]="periodFilter!==1" style="background: #ffffff; padding: 10px">
+                    <table id="classTable" class="table table-bordered" #table>
+                        <thead class="thead-light2">
+                            <tr>
+                                <th style="text-align:center"></th>
+                                <th style="text-align:center">create date</th>
+                                <th style="text-align:center">modify date</th>
+                                <th style="text-align:center">raw data id</th>
+                                <th style="text-align:center">event type</th>
+                                <th style="text-align:center">resource</th>
+                                <th style="text-align:center">time stamp</th>
+                                <th style="text-align:center">reader id</th>
+                                <th style="text-align:center">event state id</th>
+                                <th style="text-align:center">partner raw_data id</th>
+                                <th *ngFor="let key of countCampiData" style="text-align:center">campo {{key}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="fitroDataById.length==0">
+                                <td class="font-italic text-center" colspan="12">
+                                    Nessun dato per il periodo selezionato
+                                </td>
+                            </tr>
+                            <tr *ngFor="let rec of fitroDataById | filter: filter  | paginate: { itemsPerPage: 100, currentPage: p }; index as i">
+
+                                <td style="text-align:center"><button type="button" class="btn btn-primary" (click)="populateEditModal(rec)" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button></td>
+                                <td style="text-align:center">{{rec.create_date }}</td>
+                                <td style="text-align:center">{{rec.modify_date }}</td>
+                                <td style="text-align:center">{{rec.raw_data_id}}</td>
+                                <td style="text-align:center">{{rec.event_type_id}}</td>
+                                <td style="text-align:center">{{rec.resource_id}}</td>
+                                <td style="text-align:center">{{rec.time_stamp }}</td>
+                                <td style="text-align:center">{{rec.reader_id}}</td>
+                                <td style="text-align:center">{{rec.event_state_id}}</td>
+                                <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                                <td style="text-align:center" *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <pagination-controls previousLabel="precedente" nextLabel="successiva" (pageChange)="p = $event"></pagination-controls>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideSearchModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="daModal" bsModal #daModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">DATI</h5><br><br>
+
+                <button type="button" class="close" (click)="clear1()" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br>
+            <h5 *ngIf='loadingModalDati' id="loader" class="text-center">
+                <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+            </h5>
+
+            <div class="modal-body">
+                <h4 style="color:#565656;">Periodo:</h4>
+                <div class="row">
+
+                    <select [(ngModel)]="monthVar" class="form-control ml-3" style="width:15%;" (change)="getdati1(id_kpi_temp,monthVar,yearVar)">
+                        <option value="01">Gennaio</option>
+                        <option value="02">Febbraio</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Aprile</option>
+                        <option value="05">Maggio</option>
+                        <option value="06">Giugno</option>
+                        <option value="07">Luglio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Settembre</option>
+                        <option value="10">Ottobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Dicembre</option>
+                    </select>
+                    <select [(ngModel)]="yearVar" class="form-control ml-1" style="width:15%;" (change)="getdati1(id_kpi_temp,monthVar,yearVar)">
+                        <option value="">Anno</option>
+                        <option *ngFor="let year of anni">{{year}}</option>
+                    </select>
+                </div>
+                <br><br>
+                <div class="row">
+                    <input class="form-control" style="width: 18%;margin-left:22px" type="text" name="search" [(ngModel)]="filter" placeholder="Cerca">
+
+                    <button (click)="fireEvent()" style="margin-left:20%">Esporta CSV</button>
+                    <span class="event-type-wrapper">
+                      <label>Mostra Event Type</label>
+                      <input type="checkbox" name="showevent" [checked]="showEventCol" (change)="showEventCol = !showEventCol"/>
+                    </span>
+                </div>
+                <div class="table-responsive" style="background: #ffffff; padding: 10px">
+                    <table id="classTable" class="table table-bordered" #table>
+                        <thead class="thead-light2">
+                            <tr>
+                                <!--th style="text-align:center"></th-->
+                                <th style="text-align:center">create date</th>
+                                <th style="text-align:center">modify date</th>
+                                <th style="text-align:center">raw data id</th>
+                                <th style="text-align:center" [hidden]="!showEventCol">event type</th>
+                                <th style="text-align:center">resource</th>
+                                <th style="text-align:center">time stamp</th>
+                                <th style="text-align:center">reader id</th>
+                                <th style="text-align:center">event state id</th>
+                                <th style="text-align:center">partner raw_data id</th>
+                                <th *ngFor="let key of countCampiData" style="text-align:center">campo {{key}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="fitroDataById.length==0">
+                                <td class="font-italic text-center" colspan="12">
+                                    Nessun dato per il periodo selezionato
+                                </td>
+                            </tr>
+                            <tr *ngFor="let rec of fitroDataById | filter: filter  | paginate: { itemsPerPage: 100, currentPage: p }; index as i">
+
+                                <!--td style="text-align:center"><button type="button" class="btn btn-primary" (click)="populateEditModal(rec)" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button></td-->
+                                <td style="text-align:center">{{rec.create_date }}</td>
+                                <td style="text-align:center">{{rec.modify_date }}</td>
+                                <td style="text-align:center">{{rec.raw_data_id}}</td>
+                                <td style="text-align:center" [hidden]="!showEventCol">{{rec.event_type_id}}</td>
+                                <td style="text-align:center">{{rec.resource_id}}</td>
+                                <td style="text-align:center">{{rec.time_stamp }}</td>
+                                <td style="text-align:center">{{rec.reader_id}}</td>
+                                <td style="text-align:center">{{rec.event_state_id}}</td>
+                                <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                                <td style="text-align:center" *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <pagination-controls previousLabel="precedente" nextLabel="successiva" (pageChange)="p = $event"></pagination-controls>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideDaModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="editModal" bsModal #editModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Modifica Dati</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideEditModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="classTable" class="table table-bordered">
+                    <thead class="thead-light2"></thead>
+                    <tbody>
+                        <tr *ngFor="let row of campoData; index as i">
+                            <th style="text-align:center">campo {{i+1}}</th>
+                            <td colspan="2"><input type="text" class="form-control" [(ngModel)]="row"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button (click)="updateDati()" class="btn btn-success">Aggiorna</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideEditModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>

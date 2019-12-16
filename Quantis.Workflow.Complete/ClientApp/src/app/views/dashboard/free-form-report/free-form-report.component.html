@@ -1,0 +1,314 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="clearfix mb-3">
+                        <h5 class="float-left">Free Form Report Assegnati</h5>
+                    </div>
+                    <div *ngIf="loading" class="text-center mb-1">
+                        <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table #assigned class="table stripe" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-responsive-sm table-hover table-outline mb-0">
+                            <thead class="text-center" style="background: #0042be">
+                                <tr style="font-size:12px;color:white">
+                                    <th>No.</th>
+                                    <th>Nome Query</th>
+                                    <th>Report Owner</th>
+                                    <th>Azione</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <!-- <tr *ngIf="assignedReportQueries.length === 0 && !loading">
+                                    <td colspan="4"><strong>No assigned reports found.</strong></td>
+                                </tr> -->
+                                <tr *ngFor="let assignedQuery of assignedReportQueries; let i = index">
+                                    <td><div>{{ i+1 }}</div></td>
+                                    <td><div>{{ assignedQuery.queryname }}</div></td>
+                                    <td><div>{{ assignedQuery.ownername }}</div></td>
+                                    <td>
+                                        <div>
+                                            <!-- <button class="btn btn-primary btn-sm" title="View" (click)="viewAssigned(assignedQuery)"><span class="fa fa-eye"></span></button> -->
+                                            <button class="btn btn-warning btn-sm" title="Esegui" (click)="editQuery(assignedQuery,'assigned')"><span class="fa fa-edit"></span></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="clearfix mb-3">
+                        <h5 class="float-left">Propri Free Form Report</h5>
+                        <div class="float-right ">
+                            <button type="button" class="btn btn-success btn-sm" routerLink="/dashboard/form-report-query">
+                                <span class="fa fa-plus"></span> Aggiungi Query
+                            </button>
+                        </div>
+                    </div>
+                    <div *ngIf="loading" class="text-center mb-1">
+                        <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table #owned class="table stripe" datatable [dtOptions]="dtOptions2" [dtTrigger]="dtTrigger2" class="table table-responsive-sm table-hover table-outline mb-0">
+                            <thead class="text-center" style="background: #0042be">
+                                <tr style="font-size:12px;color:white">
+                                    <th>No.</th>
+                                    <th>Nome Query</th>
+                                    <th>Azione</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <!-- <tr *ngIf="ownedReportQueries.length === 0 && !loading">
+                                    <td colspan="4"><strong>No owned reports found.</strong></td>
+                                </tr> -->
+                                <tr *ngFor="let ownedQuery of ownedReportQueries; let i = index">
+                                    <td>
+                                        <div>{{ i+1 }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ ownedQuery.queryname }}</div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <button [disabled]="ownedQuery.isenabled==false" class="btn btn-primary btn-sm" data-toggle="modal"
+                                                data-target="#ConfigModal" (click)="showConfigModal(ownedQuery)">
+                                                Assegna
+                                            </button>
+                                            <button [disabled]="ownedQuery.isenabled==false" class="btn btn-warning btn-sm" title="Esegui" (click)="editQuery(ownedQuery,'owned')"><span class="fa fa-edit"></span></button>
+                                            <button [disabled]="ownedQuery.isenabled==false" class="btn btn-danger btn-sm" (click)="disable(ownedQuery)">
+                                                Disabilita
+                                            </button>
+                                            <button [disabled]="ownedQuery.isenabled==true" class="btn btn-success btn-sm" (click)="enable(ownedQuery)">
+                                                Abilita
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                  <div [hidden]="hideData==1">
+                    <br><br><h5 class="float-left">{{editQueryData.QueryName}}</h5><br>
+                    <div class="table-responsive">
+                      <!-- <button (click)="exportAsXLSX()"><i class="fa fa-file-excel-o" style="font-size:15px;color:blue"></i></button> -->
+                      <button [hidden]="hideExport" class="ml-2 mb-2" #btnExporta>Esporta CSV</button>
+                      <!-- <button [hidden]="hideExport" class="ml-2" >Esporta PDF</button> -->
+                        <br>
+                        <h5 *ngIf="loadingResult" class="text-center text-primary" style="color:#eedc00 !important">
+                            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+                        </h5>
+                        <div class="row mb-2">
+                            <div class="col-md-2">
+                                <!-- <select [hidden]="isSpecialReport==0" [(ngModel)]="client" class="form-control" placeholder="Cliente">
+                                    <option value="">Select</option>
+                                </select> -->
+                            </div>
+                            <div class="col-md-3">
+                                <!-- <select [hidden]="isSpecialReport==0" [(ngModel)]="contract" class="form-control" placeholder="Contratto">
+                                    <option value="">Select</option>
+                                </select> -->
+                            </div>
+                            <div class="col-md-5"></div>
+                            <div class="col-md-2" [hidden]="isDebug==0">
+                                <div class="txt-filter-user-div">
+                                    <input type="text" class="form-control" placeholder="Cerca" [(ngModel)]="filters.searchUsersText" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- //////////////////////////////////// -->
+                        <perfect-scrollbar style="max-height: 400px;">
+                        <table class="table stripe executedQueryResult no-padding">
+                            <thead class="text-center no-padding" style="background: #0042be;">
+                                <tr style="font-size:12px;color:white">
+                                    <th *ngFor="let key of debugQueryData">{{key}}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr *ngFor="let value of debugResult | filter : filters.searchUsersText">
+                                    <td *ngFor="let key of debugQueryData; index as i"><div [innerHTML]="value[key]"></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </perfect-scrollbar>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <!--/.col-->
+    </div>
+    <!--/.row-->
+
+</div>
+
+<div bsModal #configModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{ modalTitle }}</h4>
+                <button type="button" class="close" aria-label="Close" (click)="hideConfigModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- <select class="form-control" style="width:15%;" #searchCol5>
+                <option value="">Tutti</option>
+                <option value="assegnati">Assegnati</option>
+                <option value="non_assegnati">Non Assegnati</option>
+            </select> -->
+            <div class="modal-body">
+                <div class="txt-filter-user-div col-md-4 float-right mb-2"><input type="text" class="form-control" placeholder="Cerca"
+                    [(ngModel)]="filters.searchUsersText" /></div><br>
+                <perfect-scrollbar style="max-height: 400px;">
+                    <table class="table stripe" #assignedQueriesTable>
+                        <thead class="thead-light2">
+                            <tr style="font-size:12px;color:white"> 
+                                <th style="text-align:center">NAME</th>
+                                <th style="text-align:center">USERNAME</th>
+                                <th style="text-align:center">ASSIGNED QUERIES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of assignedQueriesBodyData | filter : filters.searchUsersText; index as i">
+                            <td style="text-align:center">{{row.name}} {{row.surname}}</td>
+                            <td style="text-align:center">{{row.ca_bsi_account}}</td>
+                            <td style="text-align:center"><input type="checkbox" [checked]="row.isassigned" (change)="populateAssignedUsers(row,$event)" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </perfect-scrollbar>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" (click)="save()">Aggiungi</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideConfigModal()">Chiudi</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div bsModal #executeModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{ executeModalTitle }}</h4>
+                <button type="button" class="close" aria-label="Close" (click)="hideExecuteModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="txt-filter-user-div col-md-4 float-right mb-2"><input type="text" class="form-control" placeholder="Cerca"
+                    [(ngModel)]="filters.searchUsersText" /></div><br>
+                <perfect-scrollbar style="max-height: 400px;">
+                    <table class="table stripe" #assignedQueriesTable>
+                        <thead class="thead-light2">
+                            <tr style="font-size:12px;color:white">
+                                <th style="text-align:center">NAME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of debugQueryData | filter : filters.searchUsersText; index as i">
+                                <td style="text-align:center">{{row[i]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </perfect-scrollbar>
+            </div>
+            <div class="modal-footer">
+                <!-- <button class="btn btn-success" (click)="save()">Aggiungi</button> -->
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideExecuteModal()">Chiudi</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div id="viewAssignedModal" bsModal #viewAssignedModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="approveModalLabel">View Free Form Report Assegnati</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideViewModal()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table id="classTable" class="table table-bordered">
+            <thead class="thead-light2">
+            </thead>
+            <tbody>
+              <tr><th>Nome Query</th><td colspan="2">{{viewAssignedData.queryname}}</td></tr>
+              <tr><th>Text Query</th><td colspan="2">{{viewAssignedData.querytext}}</td></tr>
+              <tr><th>Report Owner</th><td colspan="2">{{ownername}}</td></tr>
+              <tr><th>Parameter Key</th><th>Parameter Value</th></tr>
+              <tr *ngFor="let par of viewAssignedData.parameters">
+                <td>{{par.key}}</td><td>{{par.value}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideViewModal()">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="parametersModal" bsModal #parametersModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="approveModalLabel">{{executeModalTitle}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideParametersModal()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="addEditQueryForm" (ngSubmit)="onQueryReportFormSubmit($event)">
+                <button [hidden]="isReadonly==1" type="button" class="btn btn-success float-right" (click)="addParameters()">+ Parametri</button><br><br>
+                <div class="form-group" style="width:50%">
+                    <input [readonly]="isReadonly==1" type="text" formControlName="QueryName" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.QueryName.errors }" placeholder="Nome Query">
+                </div>
+                <span class="text-danger mb-3" *ngIf="submitted && f.QueryName.errors && f.QueryName.errors.required">Inserire nome valido per la query</span>
+                <div class="form-group">
+                    <textarea [readonly]="isReadonly==1" type="text" rows="6" formControlName="QueryText" style="font-size:16px" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.QueryText.errors }" placeholder="Testo Query"></textarea>
+                </div>
+                <span class="text-danger mb-3" *ngIf="submitted && f.QueryText.errors && f.QueryText.errors.required">Inserire testo valido per la query</span>
+                <!-- <span *ngIf="parameterCount>0"> -->
+                <div style="width:50%" formArrayName="Parameters" *ngFor="let Parameter of addEditQueryForm.get('Parameters')['controls']; let i = index;">
+                    <div class="row" [formGroupName]="i">
+                        <div class="col-md-4"><input [readonly]="isReadonly==1" (keypress)="omit_special_char($event)" (keydown)="onKeydown($event)" placeholder="Key" formControlName="key" class="form-control"></div>
+                        <div class="col-md-5"><input placeholder="Value" formControlName="value" class="form-control"></div>
+                        <div class="col-md-2 ml-1">
+                            <button [hidden]="isReadonly==1" type="button" class="btn btn-danger" (click)="deleteParameters(i)"><span class="fa fa-times"></span></button>
+                        </div>
+                    </div><br>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <button [hidden]="isReadonly==1" [disabled]="formLoading" type="submit" class="btn btn-success">
+                            <span *ngIf="formLoading" class="fa fa-spinner fa-spin"></span> Salva
+                        </button>
+                        <button [disabled]="" type="button" name="debug" (click)="onQueryReportFormSubmit('debug')" class="btn btn-primary">Esegui</button>
+                        <button [disabled]="" type="button" name="test" (click)="onQueryReportFormSubmit('test')" class="btn btn-warning">Test</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideParametersModal()">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  </div>

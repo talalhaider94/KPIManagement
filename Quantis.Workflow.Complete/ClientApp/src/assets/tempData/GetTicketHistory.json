@@ -1,0 +1,209 @@
+[
+  {
+    "logid": "210543307",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1556876415",
+    "actiondescription": "create a new request/change/issue",
+    "description": "Automatically created from Incident '20065301'."
+  },
+  {
+    "logid": "210543309",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1556876432",
+    "actiondescription": "Transfer assignee from 'cognome Analyst39, nome Analyst39 ' to ''\nTransfer group from 'RETE' to 'LUTECH_MANUTENZIONE'\nTransfer entity from 'SERVIZI TLC' to 'LUTECH'\nStatus changed from 'Open' to 'Transferred'\n",
+    "description": "Transfer assignee from 'cognome Analyst39, nome Analyst39 ' to ''\nTransfer group from 'RETE' to 'LUTECH_MANUTENZIONE'\nTransfer entity from 'SERVIZI TLC' to 'LUTECH'\nStatus changed from 'Open' to 'Transferred'\n"
+  },
+  {
+    "logid": "210543312",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1556876461",
+    "actiondescription": "AHD05376:The 'LUTECH_MANUTENZIONE' contact did not receive a notification - no notification method specified for level Normal.",
+    "description": "AHD05376:The 'LUTECH_MANUTENZIONE' contact did not receive a notification - no notification method specified for level Normal."
+  },
+  {
+    "logid": "210543380",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1556876522",
+    "actiondescription": "Status changed from 'Transferred' to 'In Carico a Manutentore'",
+    "description": "Presa in carico e associazione ticket"
+  },
+  {
+    "logid": "210543383",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1556876523",
+    "actiondescription": "FIELD='zz_ticket' OLD='' NEW='INC000001002977'\nFIELD='zz_tecname' OLD='' NEW='LUTECH_GROUP'\n",
+    "description": "FIELD='zz_ticket' OLD='' NEW='INC000001002977'\nFIELD='zz_tecname' OLD='' NEW='LUTECH_GROUP'\n"
+  },
+  {
+    "logid": "210543384",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1556876523",
+    "actiondescription": "AHD05376:The 'LUTECH_MANUTENZIONE' contact did not receive a notification - no notification method specified for level Normal.",
+    "description": "AHD05376:The 'LUTECH_MANUTENZIONE' contact did not receive a notification - no notification method specified for level Normal."
+  },
+  {
+    "logid": "210543519",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558534847",
+    "actiondescription": "Attach Document : a.txt",
+    "description": "Attach Document : a.txt"
+  },
+  {
+    "logid": "210543520",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558535571",
+    "actiondescription": "Attach Document : asd",
+    "description": "Attach Document : asd"
+  },
+  {
+    "logid": "210543521",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558535598",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543522",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558605666",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543523",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558614182",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543524",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558615028",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543525",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558615036",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543526",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558620026",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543527",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558621280",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543528",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558621515",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543529",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558667749",
+    "actiondescription": "Attach Document : Sample.txt",
+    "description": "Attach Document : Sample.txt"
+  },
+  {
+    "logid": "210543530",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558668107",
+    "actiondescription": "Attach Document : Sample.txt",
+    "description": "Attach Document : Sample.txt"
+  },
+  {
+    "logid": "210543531",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558668498",
+    "actiondescription": "Attach Document : Sample.txt",
+    "description": "Attach Document : Sample.txt"
+  },
+  {
+    "logid": "210543532",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558681920",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543533",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1558701827",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  },
+  {
+    "logid": "210543534",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1559046904",
+    "actiondescription": "Attach Document : Sample.txt",
+    "description": "Attach Document : Sample.txt"
+  },
+  {
+    "logid": "210543540",
+    "tickethandler": "cr:158045168",
+    "ticketstatus": "",
+    "msgbody": "",
+    "timestamp": "1559213164",
+    "actiondescription": "Attach Document : awe.fasjkldkasdhkshk",
+    "description": "Attach Document : awe.fasjkldkasdhkshk"
+  }
+]

@@ -1,0 +1,100 @@
+{
+  "dashboards": [
+    {
+      "id": 1,
+      "name": "Super Dashboard",
+      "owner": "amazzei",
+      "createdon": "0001-01-01T00:00:00",
+      "dashboardwidgets": [
+        {
+          "cols": 5,
+          "rows": 5,
+          "x": 0,
+          "y": 0,
+          "name": "Doughnut Chart",
+          "filters": [],
+          "properties": [],
+          "widgetid": 3,
+          "dashboardid": 1,
+          "id": 1
+        },
+        {
+          "cols": 5,
+          "rows": 5,
+          "x": 5,
+          "y": 0,
+          "minItemRows": 5,
+          "minItemCols": 5,
+          "name": "Line Chart",
+          "filters": [],
+          "properties": [],
+          "widgetid": 4,
+          "dashboardid": 1,
+          "id": 2
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Custom Dashboard",
+      "owner": "amazzei",
+      "createdon": "2019-07-24T18:29:43",
+      "dashboardwidgets": [
+        {
+          "cols": 5,
+          "rows": 5,
+          "x": 0,
+          "y": 5,
+          "name": "Doughnut Chart",
+          "component": "Doughnut Chart"
+        },
+        {
+          "cols": 5,
+          "rows": 5,
+          "x": 5,
+          "y": 0,
+          "name": "Line Chart",
+          "component": "Line Chart"
+        },
+        {
+          "cols": 5,
+          "rows": 5,
+          "x": 0,
+          "y": 0,
+          "name": "Radar Chart",
+          "component": "Radar Chart"
+        },
+        {
+          "cols": 5,
+          "rows": 5,
+          "x": 5,
+          "y": 5,
+          "name": "Line Chart",
+          "component": "Line Chart"
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "name": "Radar Chart",
+      "uiidentifier": "radar_chart",
+      "iconurl": "https://www.tutorialspoint.com/images/facebookIcon.jpg"
+    },
+    {
+      "name": "Doughnut Chart",
+      "uiidentifier": "doughnut_chart",
+      "iconurl": "https://www.tutorialspoint.com/images/facebookIcon.jpg"
+    },
+    {
+      "name": "Line Chart",
+      "uiidentifier": "line_chart",
+      "iconurl": "https://www.tutorialspoint.com/images/facebookIcon.jpg"
+    },
+    {
+      "name": "Count Trend",
+      "uiidentifier": "count_trend",
+      "iconurl": "https://www.tutorialspoint.com/images/facebookIcon.jpg"
+    }
+  ]
+}

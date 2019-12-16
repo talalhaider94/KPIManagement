@@ -1,0 +1,211 @@
+<div class="animated fadeIn">
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <div *ngIf="loading" class="text-center" id="loadingDiv">
+            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+          </div>
+          <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" id="showOnReady" style="font-size: 12px;width:100%"
+                 class="table table-responsive-sm table-hover table-outline mb-0">
+            <thead class="thead-light2">
+              <tr>
+                <th class="text-center" style="display:none">Contratto</th>
+                <th class="text-center" width="40%">KPI</th>
+                <th class="text-center">Frequenza</th>
+                <th class="text-center">N. allegati totali</th>
+                <th class="text-center">Data ultimo caricamento</th>
+                <th class="text-center">Azione</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="loadingForms.length === 0 && !loading">
+                <td colspan="7">
+                  <strong>
+                    Nessun Loading Form assegnato all'utente
+                  </strong>
+                </td>
+              </tr>
+              <tr *ngFor="let loadingForm of loadingForms; let i = index"
+                  [ngClass]="{'active': cutOffRow(loadingForm)}">
+                <td>
+                  <div>{{ loadingForm.sla_name }}</div>
+                </td>
+                <td>
+                  <div>{{ loadingForm.global_rule_name }}</div>
+                </td>
+                <td>
+                  <div class="text-center">
+                    {{ loadingForm.tracking_period }}
+                  </div>
+                </td>
+                <td>
+                  <div class="text-center">
+                    <span class="badge badge-success">
+                      {{ loadingForm.attachmentscount || '0' }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="text-center">
+                    <h1 style="font-size: 0.875rem;font-weight: 400;line-height: 1.5;" [ngClass]="formatInputDate(loadingForm.latest_input_date) === 'Nessun caricamento' ? 'badge badge-warning' : ''"><span style="display:none">{{ formatInputDate(loadingForm.latest_input_date) }}</span>
+                      {{ formatInputDateIT(loadingForm.latest_input_date) }}
+                    </h1>
+                  </div>
+                </td>
+                <td>
+                  <div class="text-center">
+                    <a style="font-size:10px" class="btn btn-primary" data-toggle="modal"
+                       data-target="#uploadCSV" (click)="uploadCSV.show(); this.loadingPattern = loadingForm.form_name">
+                      <i class="fa fa-pencil"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!--/.col-->
+  </div>
+  <!--/.row-->
+</div>
+
+<!-- TICKETS STATUS MODAL START -->
+<div bsModal #uploadCSV="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Carica CSV</h4>
+        <button type="button" class="close" (click)="uploadCSV.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- TICKETS STATUS model body -->
+          <div class="bg-white pt-2 pb-2 mb-5">
+            <div class="col-sm-12 mb-3 file-container">
+              <h5>File Allegati</h5>
+              <input type="file" class="my-custom-file-field" ng2FileSelect [uploader]="uploader" multiple
+                     (change)="onFileSelected($event)" /><br />
+            </div>
+
+            <div class="col-sm-12">
+              <h5>Elenco dei File</h5>
+              <table class="table table-responsive-sm table-hover table-outline mb-3">
+                <thead class="thead-light2">
+                  <tr>
+                    <th class="width-100">Nome File</th>
+                    <th>Azioni</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="uploader.queue.length === 0">
+                    <td colspan="4">nessun file da caricare</td>
+                  </tr>
+                  <tr *ngFor="let item of uploader.queue; let i=index">
+                    <td class="width-100">{{ item?.file?.name }}</td>
+                   
+                    <td nowrap>
+                      <button type="button" class="btn btn-danger btn-sm" (click)="item.remove()">
+                        <span class="fa fa-trash"></span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <button type="button" [disabled]="fileUploading" class="btn btn-primary" (click)="fileUploadUI()">
+                <span class="fa fa-upload" *ngIf="!fileUploading"></span>
+                <span class="fa fa-spinner fa-spin" *ngIf="fileUploading"></span> Carica
+              </button>
+            </div>
+          </div>
+        <!-- TICKETS STATUS model body end -->
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- TICKETS STATUS MODAL END -->
+<!--div id="uploadCSV" bsModal class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveModalLabel">Descrizione Calcolo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideuploadCSV()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="bg-white pt-2 pb-2 mb-5" *ngIf="readOnlyUserForm">
+          <div class="col-sm-12 mb-3 file-container">
+            <h5>File Allegati</h5>
+            <input type="file" class="my-custom-file-field" ng2FileSelect [uploader]="uploader" multiple
+                   (change)="onFileSelected($event)" /><br />
+          </div>
+
+          <div class="col-sm-12">
+            <h5>Elenco dei File</h5>
+            <table class="table table-responsive-sm table-hover table-outline mb-3">
+              <thead>
+                <tr>
+                  <th class="width-100">Nome File</th>
+                  <th>Mese</th>
+                  <th>Anno</th>
+                  <th>Azioni</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="uploader.queue.length === 0">
+                  <td colspan="4">nessun file da caricare</td>
+                </tr>
+                <tr *ngFor="let item of uploader.queue; let i=index">
+                  <td class="width-100">{{ item?.file?.name }}</td>
+                  <td>
+                    <select class="form-control" name="fileUploadMonth" [(ngModel)]="fileUploadMonth[i]">
+                      <option value="01">1</option>
+                      <option value="02">2</option>
+                      <option value="03">3</option>
+                      <option value="04">4</option>
+                      <option value="05">5</option>
+                      <option value="06">6</option>
+                      <option value="07">7</option>
+                      <option value="08">8</option>
+                      <option value="09">9</option>
+                      <option value="10">10</option>
+                      <option value="11">11</option>
+                      <option value="12">12</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-control" name="fileUploadYear" [(ngModel)]="fileUploadYear[i]">
+                      <option *ngFor="let year of anni">{{year}}</option>
+                    </select>
+                  </td>
+                  <td nowrap>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="item.remove()">
+                      <span class="fa fa-trash"></span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button type="button" [disabled]="fileUploading" class="btn btn-primary" (click)="fileUploadUI()">
+              <span class="fa fa-upload" *ngIf="!fileUploading"></span>
+              <span class="fa fa-spinner fa-spin" *ngIf="fileUploading"></span> Carica
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideuploadCSV()">
+          Chiudi
+        </button>
+      </div>
+    </div>
+  </div>
+</div-->

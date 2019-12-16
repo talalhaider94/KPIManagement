@@ -1,0 +1,124 @@
+<div style="margin-top: -20px;">
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br>
+        <h2 style="color:#565656">NOTIFICHE LOADING FORM</h2><br>
+        <!-- <div class="row">
+          <button style="margin-left:90%" class="btn btn-success" data-toggle="modal"
+                  data-target="#addConfigModal">
+            Crea Nuovo
+          </button>
+        </div><br /> -->
+        <h4 style="color:#565656;">Data di Invio:</h4>
+
+        <div class="row">
+
+            <select [(ngModel)]="monthVar" class="form-control ml-3" style="width:15%;" (change)="populateDateFilter()" #searchCol2>
+                <option value="">Tutti i mesi</option>
+                <option value="01">Gennaio</option>
+                <option value="02">Febbraio</option>
+                <option value="03">Marzo</option>
+                <option value="04">Aprile</option>
+                <option value="05">Maggio</option>
+                <option value="06">Giugno</option>
+                <option value="07">Luglio</option>
+                <option value="08">Agosto</option>
+                <option value="09">Settembre</option>
+                <option value="10">Ottobre</option>
+                <option value="11">Novembre</option>
+                <option value="12">Dicembre</option>
+            </select>
+            <select [(ngModel)]="yearVar" class="form-control ml-1" style="width:15%;" (change)="populateDateFilter()" #searchCol3>
+                <option value="">Anno</option>
+                <option value="16">2016</option>
+                <option value="17">2017</option>
+                <option value="18">2018</option>
+                <option value="19">2019</option>
+                <option value="20">2020</option>
+            </select>
+        </div>
+        <br>
+        <div class="row col-lg-12">
+            <h5 *ngIf="loading" class="text-center text-primary col-lg-12" style="color:#eedc00 !important">
+                <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+            </h5>
+        </div>
+        <br>
+        <div [ngStyle]="{'display': loading? 'none' : 'unset'}">
+            <table class="table stripe" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+                <thead class="thead-light2">
+                  <tr style="font-size:12px;color:white">
+                    <th class="text-center" style="display:none">DESTINATARIO</th>
+                    <th style="text-align:center">TIPO</th>
+                    <th style="text-align:center">PERIODO</th>
+                    <th style="text-align:center">FORM</th>
+                    <th style="text-align:center">DATA DI INVIO</th>
+                    <th style="text-align:center;">TESTO</th>
+                    <th style="display:none">TESTO1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of dataEmails; let i = index">
+                    <td style="text-align: center">{{row.user_domain}} {{row.recipient}}</td>
+                    <td style="text-align: center">{{row.type}}</td>
+                    <td style="text-align: center">{{row.period}}</td>
+                    <td style="text-align: center">{{row.form_name}}</td>
+                    <td style="text-align: center">{{row.notify_date | date: 'dd/MM/yyyy, h:mm a' || 'N/A' }}</td>
+                    <td style="text-align: center">
+                      <button class="btn btn-primary" data-toggle="modal" (click)="populateModalData(row)"
+                              data-target="#configModal" style="font-size:10px">
+                        <i class="fa fa-envelope"></i>
+                      </button>
+                    </td>
+                    <td style="display:none">{{row.email_body}}</td>
+                    <!-- <td class="tagsTip" style="text-align: center" data-ext="" attr.data-ext="{{row.email_body}}" [innerHTML]="row.email_body | slice:0:100"></td> -->
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="configModal" bsModal #configModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Testo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideConfigModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div [innerHTML]="modalData.email_body"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideConfigModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="addConfigModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!--        <h5 class="modal-title" id="approveModalLabel">Modifica la Configurazione</h5>-->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label><b>Nome Chiave</b></label><input type="text" class="form-control" placeholder="Nome Chiave" [(ngModel)]="key" /><br>
+                <label><b>Nome Owner</b></label><input type="text" class="form-control" placeholder="Nome Owner" [(ngModel)]="owner" /><br>
+                <label><b>Valore</b></label><input type="text" class="form-control" placeholder="Valore" [(ngModel)]="value" /><br>
+                <label><b>Abilitato</b></label><input style="text-align:left;width:3%" type="checkbox" class="form-control" [(ngModel)]="isenable" /><br>
+                <label><b>Descrizione</b></label><input type="text" class="form-control" placeholder="Descrizione" [(ngModel)]="description" />
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" (click)="addConfig()">Aggiungi</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>

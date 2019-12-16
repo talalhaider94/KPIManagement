@@ -1,0 +1,17 @@
+<p class="float-left no-drag">
+    <input type="text" *ngIf="isDashboardModeEdit" [(ngModel)]="widgetname" (ngModelChange)="widgetnameChange($event)" />
+    <span *ngIf="!isDashboardModeEdit"> {{ widgetname }}</span>
+</p>
+<div class="spinner-grow text-primary float-right" *ngIf="loading" role="status">
+    <span class="sr-only">Loading...</span>
+</div>
+<button type="button" [disabled]="loading" *ngIf="!isDashboardModeEdit" class="no-drag btn-sm btn btn-primary float-right mr-1" (click)="openModal()">
+    <i class="fa fa-cog"></i>
+</button>
+<div class="clearfix"></div>
+
+<p class="font-12 mb-1"><b>Periodo:</b> {{ period || 'N/A' }}</p>
+<p class="font-12 mb-1" *ngIf="incompletePeriod">Priodo Incompleto</p>
+<highcharts-chart [Highcharts]="highcharts" [options]="myChartOptions" [(update)]="myChartUpdateFlag"
+[oneToOne]="true" class="w-100p d-block">
+</highcharts-chart>

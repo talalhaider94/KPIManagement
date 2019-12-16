@@ -1,0 +1,104 @@
+<div style="margin-top: -20px;">
+
+  <div class="table-responsive" style="background: #ffffff; padding: 10px">
+    <br><h2 style="color:#565656">GENERAZIONE BOOKLET DA TEMPLATE</h2>
+    <!-- <div class="row">
+      <button style="margin-left:90%" class="btn btn-success" (click)="showAddConfigModal()">
+          Crea Booklet
+      </button>
+  </div><br /> -->
+    <span style="margin-left: 75%; font-size: 20px"><b>PERIODO CORRENTE: {{datacorrente}}</b></span><br>
+
+    <div class="row ml-3 mr-1">
+      <label style="margin-top: 6px;">TEMPLATE:</label>
+      <select class="form-control ml-3 mr-1 float-left" (change)="consoleSelect($event)" placeholder="seleziona" style="width:30%;" [(ngModel)]=" documentiDef.documentid">
+        <option value="">Documenti: </option>
+        <!-- value="{{item.documentid}} - {{item.documentname}}" -->
+        <option *ngFor="let item of documentiDef " value="{{item.documentid}}">{{item.documentname}}</option>
+      </select>
+      <select class="form-control" style="width:15%;margin-left:1%" #searchCol1 id="searchCol1" [(ngModel)]="viewModel.filters.tuttiClienti" name="tuttiClienti"><option value="">Tutti i Clienti</option></select>
+
+      <button [disabled]="(documentId==0 || item==0) " style="margin-left:1%" class="btn btn-success float-right" (click)="addBooklet()">
+        <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Crea Booklet
+      </button>
+    </div>
+
+    <span>&nbsp;&nbsp;</span><br>
+    <table class="table-striped" #ArchivedkpiTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+      <thead class="thead-light2">
+        <tr>
+          <th style="align-content: center; width:10%">SELEZIONA</th>
+          <th style="align-content: center">CLIENTE</th>
+          <th style="align-content: center">CONTRATTO</th>
+          <!-- <th style="align-content: center">PRECEDENTE <span>&nbsp;</span>{{dataprecedente}}</th>
+          <th style="align-content: center">CORRENTE<span>&nbsp;</span> {{datacorrente}}</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of contrat">
+          <td align="center"><input [(ngModel)]="row.checked" type="checkbox" (change)="getId(row)" /></td>
+          <td style="align-content: center">{{row.contractpartyname}}</td>
+          <td style="align-content: center">{{row.contractname}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!--NON CANCELLARE PROGRESS BAR DINAMICA-->
+    <!--   <div class="table-responsive" style="background: #ffffff; padding: 10px">
+      <table class="table">
+        <thead style="background: #E6E6E6">
+        <tr>
+
+            <th>NOME</th>
+            <th>COGNOME</th>
+            <th>PRECEDENTE</th>
+            <th>CORRENTE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of documenti; index as i">
+
+            <td>{{row.nome}}</td>
+            <td>{{row.cognome}}</td>
+            <th>
+
+            <div class="progress" aria-valuemax="(row.success+row.warning+row.danger)" style="width: 70%">
+                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="row.success" aria-valuemin="0" aria-valuemax="(row.success+row.warning+row.danger)"  [ngStyle]="{width: (row.success/(row.success+row.warning+row.danger))*100 + '%'}">{{row.success}}</div>
+                <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="row.warning" aria-valuemin="0" aria-valuemax="(row.success+row.warning+row.danger)"  [ngStyle]="{width: (row.warning/(row.success+row.warning+row.danger))*100 + '%'}">{{row.warning}}</div>
+                <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="row.danger" aria-valuemin="0" aria-valuemax="(row.success+row.warning+row.danger)"  [ngStyle]="{width: (row.danger/(row.success+row.warning+row.danger))*100 + '%'}">{{row.danger}}</div>
+              </div>
+           </th>
+            <th>
+          </th>
+          </tr>
+          </tbody>
+      </table>
+    </div>
+  </div>-->
+    <div id="thresholdModal" bsModal #thresholdModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+         aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Il suo utente non ha un indirizzo e-mail configurato. Inserire un indirizzo e-mail valido al quale spedire  i </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideThresholdModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body row">
+                <div class="col-md-6" style="margin-top:-5px">
+                    <input type="email" class="form-control" [(ngModel)]="validEmail" placeholder="Email" >
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" (click)="createbooklet()">Invia</button>
+                <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideThresholdModal()">Chiudi</button> -->
+            </div>
+          </div>
+          <!-- <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-dismiss="modal" (click)="createbooklet()">Salva</button>
+            <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideThresholdModal()">Chiudi</button>
+          </div> -->
+        </div>
+      </div>
+    </div>

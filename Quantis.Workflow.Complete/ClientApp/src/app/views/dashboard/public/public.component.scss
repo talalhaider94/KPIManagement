@@ -1,0 +1,24 @@
+// For ejs-treeview
+@import "@syncfusion/ej2-base/styles/material.css";
+@import "@syncfusion/ej2-angular-navigations/styles/material.css";
+@import "@syncfusion/ej2-inputs/styles/material.css";
+@import "@syncfusion/ej2-buttons/styles/material.css";
+
+perfect-scrollbar {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+:host {
+    gridster {
+        height: calc(100vh + 200px);
+    }
+}
+
+.card {
+    border: 0px solid #c8ced3 !important;
+}
+
+gridster-item {
+    border: 1px solid #c8ced3;
+}

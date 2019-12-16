@@ -1,0 +1,166 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-primary pull-right mb-4 ml-4" (click)="isCollapsed = !isCollapsed"
+                    [attr.aria-expanded]="!isCollapsed" aria-controls="collapseBasic">
+                <i class="fa fa-search"></i>
+            </button>
+            <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
+                <div class="row justify-content-end">
+                    <div class="col-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="form-group row justify-content-right">
+                                    <div class="form-group col-6">
+                                        <label for="monthOption"><strong>Mese</strong></label>
+                                        <select #monthSelect class="form-control" name="monthOption"
+                                                [(ngModel)]="monthOption" (change)="onDataChange()">
+                                            <option value="all">Tutti</option>
+                                            <option value="01">1</option>
+                                            <option value="02">2</option>
+                                            <option value="03">3</option>
+                                            <option value="04">4</option>
+                                            <option value="05">5</option>
+                                            <option value="06">6</option>
+                                            <option value="07">7</option>
+                                            <option value="08">8</option>
+                                            <option value="09">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label for="yearOption"><strong>Anno</strong></label>
+                                        <select #yearSelect class="form-control" name="yearOption"
+                                                [(ngModel)]="yearOption" (change)="onDataChange()">
+                                            <option value="all">Tutti</option>
+                                            <option value="16">2016</option>
+                                            <option value="18">2017</option>
+                                            <option value="18">2018</option>
+                                            <option value="19">2019</option>
+                                            <option value="20">2020</option>
+                                        </select>
+                                    </div>
+                                    <div class="w-100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <div *ngIf="loading" class="text-center">
+                            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                        </div>
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                               class="table table-responsive-sm table-hover table-outline mb-0 text-center mytable">
+                            <thead class="thead-light2">
+                                <tr>
+                                    <!-- <th>No.</th> -->
+                                    <th>Rif. Num</th>
+                                    <th>Periodo</th>
+                                    <th>Status</th>
+                                    <th>Target</th>
+                                    <th>Valore</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="searchedTickets && searchedTickets.length === 0 && !loading">
+                                    <td colspan="6"><strong>Nessun Ticket Trovato</strong></td>
+                                </tr>
+                                <tr *ngFor="let ticket of searchedTickets; let i = index">
+                                    <!-- <td>{{ i+1 }}</td> -->
+                                    <td>{{ ticket.ref_num || 'N/A' }}</td>
+                                    <td>{{ ticket.period || 'N/A' }}</td>
+                                    <td>{{ ticket.status || 'N/A' }}</td>
+                                    <td>{{ parseTargetValue(ticket.description) || 'N/A' }}</td>
+                                    <td>{{ parseValoreValue(ticket.description) || 'N/A' }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                                (click)="openModal(ticket)">
+                                            <span class="fa fa-calendar"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/.col-->
+    </div>
+    <!--/.row-->
+</div>
+
+<div bsModal #editTicketModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-success modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Edit ID: {{editTicketId}} - Ref: {{editTicketRef}} - {{ editTicketTarget }}</h4>
+                <button type="button" class="close" (click)="editTicketModal.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- edit model body table -->
+                <form [formGroup]="editTicketForm" (ngSubmit)="onEditTicketFormSubmit()">
+                    <div class="input-group mb-3">
+                        <input type="number" min="0" formControlName="Value" class="form-control"
+                               placeholder="Valore"
+                               [ngClass]="{ 'is-invalid': submitted && editTicketValues.Value.errors }" />
+                    </div>
+                    <span class="text-danger mb-3" *ngIf="submitted && editTicketValues.Value.errors && editTicketValues.Value.errors.required">Valore obbligatorio</span>
+
+                    <div class="input-group mb-3">
+                        <input type="text" formControlName="Sign" class="form-control"
+                               placeholder="Unità di misura"
+                               [ngClass]="{ 'is-invalid': submitted && editTicketValues.Sign.errors }" />
+                    </div>
+                    <span class="text-danger mb-3" *ngIf="submitted && editTicketValues.Sign.errors && editTicketValues.Sign.errors.required">Unità di misura obbligatoria</span>
+
+                    <div class="input-group mb-3">
+                        <select class="form-control" formControlName="Type" [ngClass]="{ 'is-invalid': submitted && editTicketValues.Type.errors }">
+                            <option value="">Seleziona</option>
+                            <option value="1">Complaint</option>
+                            <option value="2">Non Compliant</option>
+                        </select>
+                    </div>
+                    <span class="text-danger mb-3" *ngIf="submitted && editTicketValues.Type.errors && editTicketValues.Type.errors.required">
+                        Tipo obbligatorio
+                    </span>
+
+                    <div class="input-group mb-3">
+                        <textarea formControlName="Note" class="form-control"
+                                  [ngClass]="{ 'is-invalid': submitted && editTicketValues.Note.errors }"
+                                  placeholder="Nota" rows="3"></textarea>
+                    </div>
+                    <span class="text-danger mb-3" *ngIf="submitted && editTicketValues.Note.errors && editTicketValues.Note.errors.required">
+                        Nota obbligatoria.
+                    </span>
+                    <div class="row">
+                        <div class="col-6">
+                            <button [disabled]="loading" type="submit" class="btn btn-primary px-4">
+                                <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Salva
+                            </button>
+                            <button type="button" class="btn btn-secondary" (click)="editTicketModal.hide()">Chiudi </button>
+                        </div>
+                    </div>
+                </form>
+                <!-- edit model body table end -->
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

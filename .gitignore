@@ -1,0 +1,26 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/Quantis.Workflow.Complete
+/Quantis.WorkFlow.APIBase/bin/Release/netcoreapp2.2
+/Quantis.WorkFlow.APIBase/obj
+/Quantis.WorkFlow.Models/bin
+/Quantis.WorkFlow.Models/obj
+/Quantis.WorkFlow.Services/bin/Release/netcoreapp2.2
+/Quantis.WorkFlow.Services/obj
+/Quantis.WorkFlow.UnitTest/bin
+/Quantis.WorkFlow.UnitTest/obj
+.vs
+/FormAdapterService/FormAdapterService/bin
+/FormAdapterService/FormAdapterService/obj
+/FormAdapterService/packages
+/Quantis.WorkFlow.Jobs/obj
+/Quantis.WorkFlow.Jobs/bin/Release/netcoreapp2.2
+/Quantis.WorkFlow.Models/Quantis.WorkFlow.Models.csproj.user
+/CreateBookEXE/CreateBookletConsole/packages/Newtonsoft.Json.11.0.1
+/CreateBookEXE/CreateBookletConsole/CreateBookletConsole/bin/Debug
+/CreateBookEXE/CreateBookletConsole/CreateBookletConsole/obj
+/FormAdapterService/FormAdapterService.sln.DotSettings.user
+/CreateBookEXE/CreateBookletConsole/packages/Newtonsoft.Json.12.0.2
+/FormAdapterService/FormAdapterService/BookletParams

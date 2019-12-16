@@ -1,0 +1,117 @@
+<div style="margin-top: -20px;">
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br />
+        <h2 style="color:#565656">CONFIGURAZIONI SPECIALI</h2><br>
+        <h3 style="color:#565656">Unità Organizzativa</h3>
+        <button class="btn btn-success float-right" data-toggle="modal" (click)="addOrganizationModal()">
+            Aggiungi
+        </button><br /><br />
+        <table class="table stripe" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+            <thead class="thead-light2">
+                <tr style="font-size:12px;color:white">
+                    <th style="text-align:center">Unità Organizzativa</th>
+                    <th style="text-align:center"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of organizationsData; index as i">
+                    <td style="text-align:center">{{row.value}}</td>
+                    <td style="text-align: center">
+                        <button class="btn btn-primary" data-toggle="modal" (click)="populateModalData(row)"
+                                style="font-size:10px">
+                                Aggiorna
+                            <!-- <i class="fa fa-pencil"></i> -->
+                        </button>
+                        <button class="btn btn-danger" [swal]="{title: 'Conferma', text: 'Eliminare il Organizzazione?', confirmButtonClass: 'btn btn-danger', showCancelButton: true, cancelButtonText: 'Annulla', confirmButtonText: 'Elimina'  }"
+                                (confirm)="deleteOrganization(row)" (cancel)="onCancel($event)"
+                                style="font-size:10px">
+                                Cancella
+                            <!-- <i class="fa fa-trash"></i> -->
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br />
+        <h3 style="color:#565656">Report: Valori Speciali </h3>
+        <button class="btn btn-success float-right" data-toggle="modal" (click)="addSpecialModal()">
+            Aggiungi
+        </button><br /><br />
+        <table class="table stripe" #SpecialValueTable datatable [dtOptions]="dtOptions2" [dtTrigger]="dtTrigger2">
+            <thead class="thead-light2">
+                <tr style="font-size:12px;color:white">
+                    <th style="text-align:center">Valore</th>
+                    <th style="text-align:center">Risultato</th>
+                    <th style="text-align:center">Nota Speciale</th>
+                    <th style="text-align:center"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of specialReportsData; index as i">
+                    <td style="text-align:center">{{row.key}}</td>
+                    <td style="text-align:center">{{row.value}}</td>
+                    <td style="text-align:center">{{row.note}}</td>
+                    <td style="text-align: center">
+                        <button class="btn btn-primary" data-toggle="modal" (click)="populateSpecialModalData(row)"
+                                style="font-size:10px;">
+                                Aggiorna
+                            <!-- <i class="fa fa-pencil"></i> -->
+                        </button>
+                        <button class="btn btn-danger" [swal]="{title: 'Conferma', text: 'Eliminare il Valori Speciali?', confirmButtonClass: 'btn btn-danger', showCancelButton: true, cancelButtonText: 'Annulla', confirmButtonText: 'Elimina'  }"
+                                (confirm)="deleteSpecialValue(row)" (cancel)="onCancel($event)"
+                                style="font-size:10px">
+                                Cancella
+                            <!-- <i class="fa fa-trash"></i> -->
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="addConfigModal" bsModal #addConfigModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">{{modalTitle}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideAddConfigModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label><b>Valore</b></label><input type="text" class="form-control" placeholder="Valore" [(ngModel)]="value" style="width:50%" /><br>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" (click)="addOrganization()">{{buttonText}}</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideAddConfigModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="specialModal" bsModal #specialModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">{{modalTitle}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideSpecialModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label><b>Valore</b></label><input type="text" class="form-control" placeholder="Valore" [(ngModel)]="specialKey" style="width:50%" /><br>
+                <label><b>Risultato</b></label><input type="text" class="form-control" placeholder="Risultato" [(ngModel)]="specialValue" style="width:50%" /><br>
+                <label><b>Nota Speciale</b></label><textarea class="form-control" placeholder="Nota Speciale" [(ngModel)]="specialNote" style="width:50%"></textarea><br>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" (click)="addSpecialValue()">{{buttonText}}</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideSpecialModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>

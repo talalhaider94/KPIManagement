@@ -1,0 +1,20 @@
+<p class="float-left no-drag">
+    <input type="text" *ngIf="isDashboardModeEdit" [(ngModel)]="widgetname" (ngModelChange)="widgetnameChange($event)" />
+    <span *ngIf="!isDashboardModeEdit"> {{ widgetname }}</span>
+</p>
+<div class="spinner-grow text-primary float-right" *ngIf="loading" role="status">
+    <span class="sr-only">Loading...</span>
+</div>
+<button type="button" [disabled]="loading" *ngIf="!isDashboardModeEdit"
+        class="no-drag btn-sm btn btn-primary float-right mr-1" (click)="openModal()">
+    <i class="fa fa-cog"></i>
+</button>
+<div class="clearfix"></div>
+<div class="card text-white bg-success mt-3">
+    <div class="card-body p-3 text-center">
+        <div class="h1">{{ sumKPICount }}</div>
+        <p class="font-12 mb-1">{{ measure }}</p>
+        <p class="font-12 mb-1"><b>Periodo: </b>{{ period || 'N/A'}}</p>
+        <p class="font-12 mb-1" *ngIf="incompletePeriod">Priodo Incompleto</p>
+    </div>
+</div>

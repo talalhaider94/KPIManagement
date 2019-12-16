@@ -1,0 +1,30 @@
+.rightAlign {
+    text-align: right;
+}
+
+.leftAlign {
+    text-align: left;
+}
+
+/* start - Solution 1: with CSS only - Scroll on top */
+// .top-scroll-table-container {
+//     max-width: 2000px;
+//     overflow-x: scroll;
+//     overflow-y: auto;
+//     transform:rotateX(180deg);
+// }
+// .top-scroll-table-container .dataTables_wrapper {
+//     width: 1600px;
+//     transform: rotateX(180deg);
+//     overflow: hidden;
+// }
+/* end - Solution 1: with CSS only - Scroll on top */
+
+/* start - Solution 2: with HTML, TS & CSS - Scroll on top */
+.top-scroll-table-container,
+.top-scroll-container {
+    max-width: 2000px;
+    overflow-x: scroll;
+    overflow-y: auto;
+}
+/* end - Solution 2: with HTML, TS & CSS - Scroll on top */

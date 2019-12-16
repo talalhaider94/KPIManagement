@@ -1,0 +1,120 @@
+<div class="card" id="widgetsList" style="z-index:999">
+    <div class="card-header py-2">
+        <div class="row align-items-center">
+            <div class="col-6">
+                <b>{{dashboardName}}</b>
+            </div>
+            <div class="col-6 text-right">
+                <a [routerLink]="['/dashboard/public', dashboardId]" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i></a>
+                <button class="btn btn-success btn-sm" (click)="saveDashboard()"><i class="fa fa-save"></i> Salva</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-1">
+        <app-menu [widgetCollection]="widgetCollection"></app-menu>
+    </div>
+</div>
+
+<!-- Gridster grid -->
+<gridster [options]="options" (drop)="onDrop($event)" class="bg-white">
+    <!-- Earch grister-item is generated with *ngFor -->
+    <gridster-item [ngClass]="(item.uiidentifier == 'kpi_count_summary') ? 'kpi_count_summary' : 'other-widgets'"
+                   [item]="item" *ngFor="let item of dashboardWidgetsArray">
+        <div class="card" style="height:100%;padding-bottom: 1.5rem;">
+            <div class="card-body" style="height:100%">
+                <div class="float-right">
+                    <!-- Delete button call removeItem() who takes as parameter item -->
+                    <button class="no-drag btn btn-sm btn-danger" (click)="removeItem(item)">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                    <!-- Drag button (need drag-handler class) -->
+                    <button class="btn btn-sm btn-primary no-drag" (click)="cloneWidget(item)">
+                        <i class="fa fa-copy"></i>
+                    </button>
+                </div>
+                <!-- <div class="clearfix"></div> -->
+                <!--
+                  ndc-dynamic tag is from ng-dynamic-component library
+                  it generates a dynamic component on the fly
+                  here item is DashboardContentModel
+                -->
+                <ndc-dynamic class="no-drag" [ndcDynamicComponent]="item.component" [ndcDynamicInputs]="item"
+                             [ndcDynamicOutputs]="outputs" (ndcDynamicCreated)="componentCreated($event)" style="width:100%">
+                </ndc-dynamic>
+            </div>
+        </div>
+    </gridster-item>
+</gridster>
+<!-- modal start -->
+<!-- <div bsModal #widgetParametersModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body" *ngIf="barChartWidgetParameters">
+        <p>
+          <strong>Widget:</strong> {{barChartWidgetParameters.widgetname}}
+        </p>
+        <form [formGroup]="widgetParametersForm" (ngSubmit)="onWidgetParametersFormSubmit()">
+          <tabset>
+            <tab heading="PROPERTIES" id="tab1">
+              <div formGroupName="Properties">
+                <div class="form-group" *ngIf="barChartWidgetParameters.showcharttype">
+                  <label for="charttype">Chart Type</label>
+                  <select class="form-control" id="charttype" formControlName="charttype">
+                    <option *ngFor="let type of barChartWidgetParameters.charttypes | keyvalue; let i = index"
+                      [attr.selected]="!i" [ngValue]="type.key">
+                      {{ type.value }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group" *ngIf="barChartWidgetParameters.showaggregationoption">
+                  <label for="aggregationoption">Aggregations</label>
+                  <select class="form-control" id="aggregationoption" formControlName="aggregationoption">
+                    <option *ngFor="let option of barChartWidgetParameters.aggregationoptions | keyvalue; let i = index"
+                      [ngValue]="option.key" [attr.selected]="!i">
+                      {{ option.value }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group" *ngIf="barChartWidgetParameters.showmeasure">
+                  <label for="measure">Measures</label>
+                  <select class="form-control" id="measure" formControlName="measure">
+                    <option *ngFor="let measure of barChartWidgetParameters.measures | keyvalue; let i = index"
+                      [attr.selected]="!i" [ngValue]="measure.key">
+                      {{ measure.value }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </tab>
+            <tab heading="FILTERS">
+              <div formGroupName="Filters">
+                <div class="form-group">
+                  <label for="daterange">Date Range</label>
+                  <input type="text" formControlName="daterange" placeholder="Pick Date Range" class="form-control"
+                    bsDaterangepicker [bsConfig]="{ rangeInputFormat: 'MM/YYYY' }">
+                </div>
+              </div>
+            </tab>
+            <tab heading="HELP">
+              {{ helpText }}
+            </tab>
+          </tabset>
+          <div class="row justify-content-end mt-3">
+            <div class="col-6 text-right">
+              <button type="submit" class="btn btn-outline-primary btn-sm px-4">
+                Apply
+              </button>
+
+              <a (click)="widgetParametersModal.hide()" role="button"
+                class="btn btn-primary pointer-cursor btn-sm px-4">
+                Cancel
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> -->
+<!-- modal end -->

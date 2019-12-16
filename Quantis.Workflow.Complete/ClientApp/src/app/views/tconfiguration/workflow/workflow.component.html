@@ -1,0 +1,77 @@
+<div style="margin-top: -20px;">
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br>
+        <h2 style="color:#565656">WORKFLOW</h2><br>
+        <!-- <div class="row">
+            <button style="margin-left:90%" class="btn btn-success" data-toggle="modal"
+                    data-target="#addConfigModal" (click)="showAddConfigModal()">
+                Crea Nuovo
+            </button>
+        </div> -->
+        <br />
+        <table class="table stripe" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+            <thead class="thead-light2">
+                <tr style="font-size:12px;color:white">
+                    <th style="text-align:center">Contraenti</th>
+                    <th style="text-align:center">Contratti</th>
+                    <th style="text-align:center;display:none">Cut Off Day</th>
+                    <th style="text-align:center">Workflow Day</th>
+                    <th style="text-align:center">AZIONE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of ConfigTableBodyData; index as i">
+                    <td>{{row.contractpartyname}}</td>
+                    <td>{{row.contractname}}</td>
+                    <td style="text-align: center;display:none">{{row.daycuttoff}}</td>
+                    <td style="text-align: center">{{row.dayworkflow}}</td>
+                    <td style="text-align: center">
+                        <button class="btn btn-primary" data-toggle="modal" (click)="populateModalData(row)"
+                                data-target="#configModal" style="font-size:10px">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="configModal" bsModal #configModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Modifica la Configurazione</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideConfigModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="classTable" class="table table-bordered">
+                    <thead class="thead-light2">
+                        <tr>
+                            <th>Contraenti</th>
+                            <th>Contratti</th>
+                            <th style="width:15%;display:none">Cut Off Day</th>
+                            <th style="width:15%">Workflow Day</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{modalData.contractparty}}</td>
+                            <td>{{modalData.contract}}</td>
+                            <td style="width:15%;display:none"><input type="number" class="form-control" [(ngModel)]="modalData.cutoff" (ngModelChange)="changeModal($event)"></td>
+                            <td style="width:16%"><input type="number" class="form-control" [(ngModel)]="modalData.workflowday" (ngModelChange)="changeModal($event)"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button (click)="updateConfig(modalData)" class="btn btn-success">Aggiorna</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideConfigModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+

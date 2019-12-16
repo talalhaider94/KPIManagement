@@ -1,0 +1,442 @@
+<div class="table-responsive bg-white p-3">
+  <h2>Report da BSI</h2>
+  <h5 *ngIf="loading" class="text-center text-primary" style="color:#eedc00 !important">
+    <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+  </h5>
+  <div class="row">
+      <div class="form-group col-sm-4">
+          <label><strong>Cartella</strong></label>
+          <select #cartellaSelect class="form-control" name="cartellaSelectOption"
+                  [(ngModel)]="cartellaSelectOption">
+              <option value="" selected>Tutti</option>
+              <option *ngFor="let p of cartellaList" [value]="p">{{p}}</option>
+          </select>
+
+          <!-- <select class="form-control" style="width:15%;" #searchCol4 [(ngModel)]="viewModel.filters.tuttiContratti" name="tuttiContratti"><option value="">Tutti i Contratti</option></select> -->
+      </div>
+  </div>
+  <table class="table stripe text-center" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+    <thead class="thead-light2">
+      <tr class="text-white">
+        <th>Cartella</th>
+        <th style="width:40%">Nome</th>
+        <th>Tipo</th>
+        <th>Data Modifica</th>
+        <th>Azioni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of AllNormalReportsData; index as i">
+        <td style="padding:unset;vertical-align: middle;">{{row.foldername}}</td>
+        <td style="padding:unset;vertical-align: middle;width:40%">{{row.itemname}}</td>
+        <td style="padding:unset;vertical-align: middle;">{{row.reporttype}}</td>
+        <td style="padding:unset;vertical-align: middle;">{{row.modifieddate | date:'MM/dd/yyyy, hh:mm a'}}</td>
+        <td style="padding:unset;vertical-align: middle;">
+          <a class="btn btn-primary btn-sm pointer-cursor" (click)="getReportDetails(row.itemid)"
+          style="margin:2px">
+            <i class="fa fa-eye"></i>
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<!-- modal start -->
+<div bsModal #bsiChartModal="bs-modal" class="modal fade bs-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-xl" style="width:90% !important;" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ReportData.name}}</h5>
+        <button type="button" class="close" aria-label="Close" (click)="hideModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="reportsDataLength==1">
+          <div class="table-responsive" *ngIf="ReportData">
+            <table class="table table-bordered freeFormReportTable font-12">
+              <thead class="thead-light2">
+                <tr>
+                  <th>Contraente</th>
+                  <th>Contratto</th>
+                  <th>KPI</th>
+                  <th>Granularità dei dati</th>
+                  <th>Data di Calcolo</th>
+                  <th>Stato del Calcolo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ ReportDetailsData.contractparty }} </td>
+                  <td>{{ ReportDetailsData.contract }} </td>
+                  <td>{{ ReportDetailsData.rule }} </td>
+                  <td>{{ ReportDetailsData.datagranularity }} </td>
+                  <td>{{ ReportDetailsData.calculationstatuslastdate }}</td>
+                  <td>{{ ReportDetailsData.calculationstatustext }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <div class="row">
+              <h6 class="ml-3" style="color:#565656">Periodo:</h6>
+              <select [(ngModel)]="dayDrillPeriod" class="form-control ml-2" style="width:9%;margin-top:-8px" (change)="selectedPeriod()">
+                <!-- <option value="">Select</option> -->
+                <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+              </select>
+            </div>
+            <button class="btn btn-primary btn-sm float-right" (click)="chartClicked()"><i class="fa fa-table"></i></button>
+            <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions" [(update)]="chartUpdateFlag"
+            [oneToOne]="true" class="w-100p d-block one">
+          </highcharts-chart><br><br>
+
+          
+          <highcharts-chart [hidden]="isDayDrill==0" [Highcharts]="highcharts" [options]="dayChartOptions" [(update)]="dayChartUpdateFlag"
+            [oneToOne]="true" style="width: 100%; display: block;">
+          </highcharts-chart><br><br>
+
+          <h5 *ngIf='loadingModalDati' id="loader" class="text-center">
+            <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+          </h5>
+          <div [hidden]="isLoadedDati==0" class="table-responsive" style="background: #ffffff; padding: 10px">
+            <div class="row">
+                <h5 class="ml-2" style="color:#565656;">Periodo:</h5>
+                <select [(ngModel)]="monthVar" class="form-control ml-2" style="width:15%;" (change)="selectedMonth($event)">
+                  <!-- <option value="">Select</option> -->
+                  <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+                </select>
+                <h6 class="float-right" style="color:#565656; margin-left: 90%; margin-top: -2%">{{selectedmonth}}/{{selectedyear}}</h6>
+                <!-- <h6 class="float-right" style="color:#565656; margin-left: 70%; margin-top: -2%">{{bar_period}}/{{bar_value}}</h6> -->
+            </div><br>  
+            <table id="classTable" class="table table-bordered  font-12" #table>
+                  <thead class="thead-light2">
+                      <tr class="text-center">
+                          <th>create date</th>
+                          <th>modify date</th>
+                          <th>raw data id</th>
+                          <th [hidden]="!showEventCol">event type</th>
+                          <th>resource</th>
+                          <th>time stamp</th>
+                          <th>reader id</th>
+                          <th>event state id</th>
+                          <th>partner raw_data id</th>
+                          <th *ngFor="let key of countCampiData">campo {{key}}</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngIf="fitroDataById.length==0">
+                          <td class="font-italic text-center" colspan="12">
+                              Nessun dato per il periodo selezionato
+                          </td>
+                      </tr>
+                      <tr *ngFor="let rec of fitroDataById; index as i" class="text-center">
+
+                          <!-- <td style="text-align:center"><button type="button" class="btn btn-primary" (click)="populateEditModal(rec)" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button></td> -->
+                          <td>{{rec.create_date }}</td>
+                          <td>{{rec.modify_date }}</td>
+                          <td>{{rec.raw_data_id}}</td>
+                          <td [hidden]="!showEventCol">{{rec.event_type_id}}</td>
+                          <td>{{rec.resource_id}}</td>
+                          <td>{{rec.time_stamp }}</td>
+                          <td>{{rec.reader_id}}</td>
+                          <td>{{rec.event_state_id}}</td>
+                          <td>{{rec.partner_raw_data_id}}</td>
+                          <td *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                      </tr>
+                  </tbody>
+              </table>
+              <!-- <pagination-controls previousLabel="precedente" nextLabel="successiva" (pageChange)="p = $event"></pagination-controls> -->
+          </div>
+          </div>
+        </div>
+
+        <div *ngIf="reportsDataLength>1" class="row">
+          
+          <div class="col-md-6">
+            <div class="table-responsive" *ngIf="ReportData">
+              <table class="table table-bordered freeFormReportTable font-12">
+                <thead class="thead-light2">
+                  <tr>
+                    <th>Contraente</th>
+                    <th>Contratto</th>
+                    <th>KPI</th>
+                    <th>Granularità dei dati</th>
+                    <th>Data di Calcolo</th>
+                    <th>Stato del Calcolo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ ReportDetailsData.contractparty }} </td>
+                    <td>{{ ReportDetailsData.contract }} </td>
+                    <td>{{ ReportDetailsData.rule }} </td>
+                    <td>{{ ReportDetailsData.datagranularity }} </td>
+                    <td>{{ ReportDetailsData.calculationstatuslastdate }}</td>
+                    <td>{{ ReportDetailsData.calculationstatustext }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <br>
+              
+              <div class="row">
+                <h6 class="ml-3" style="color:#565656">Periodo:</h6>
+                <select [(ngModel)]="dayDrillPeriod" class="form-control ml-2" style="width:17%;margin-top:-8px" (change)="selectedPeriod()">
+                  <!-- <option value="">Select</option> -->
+                  <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary btn-sm float-right" (click)="chartClicked()"><i class="fa fa-table"></i></button>
+              <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions" [(update)]="chartUpdateFlag"
+              [oneToOne]="true" class="w-100p d-block three">
+              </highcharts-chart><br><br>
+              
+              <!-- <h5 *ngIf='loadingModalDati' id="loader" class="text-center">
+                <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+              </h5>
+              <div [hidden]="isLoadedDati==0" class="table-responsive" style="background: #ffffff; padding: 10px">
+                <select [(ngModel)]="monthVar" class="form-control ml-1" style="width:25%;" (change)="selectedMonth($event)">
+                  <option *ngFor="let month of months; index as i" value={{i+1}}>{{month}}</option>
+                </select><br>  
+                  <table id="classTable" class="table table-bordered" #table>
+                      <thead style="background: #20a8d8; color:white">
+                          <tr>
+                              <th style="text-align:center">create date</th>
+                              <th style="text-align:center">modify date</th>
+                              <th style="text-align:center">raw data id</th>
+                              <th style="text-align:center" [hidden]="!showEventCol">event type</th>
+                              <th style="text-align:center">resource</th>
+                              <th style="text-align:center">time stamp</th>
+                              <th style="text-align:center">reader id</th>
+                              <th style="text-align:center">event state id</th>
+                              <th style="text-align:center">partner raw_data id</th>
+                              <th *ngFor="let key of countCampiData" style="text-align:center">campo {{key}}</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngIf="fitroDataById.length==0">
+                              <td class="font-italic text-center" colspan="12">
+                                  Nessun dato per il periodo selezionato
+                              </td>
+                          </tr>
+                          <tr *ngFor="let rec of fitroDataById; index as i">
+                              <td style="text-align:center">{{rec.create_date }}</td>
+                              <td style="text-align:center">{{rec.modify_date }}</td>
+                              <td style="text-align:center">{{rec.raw_data_id}}</td>
+                              <td style="text-align:center" [hidden]="!showEventCol">{{rec.event_type_id}}</td>
+                              <td style="text-align:center">{{rec.resource_id}}</td>
+                              <td style="text-align:center">{{rec.time_stamp }}</td>
+                              <td style="text-align:center">{{rec.reader_id}}</td>
+                              <td style="text-align:center">{{rec.event_state_id}}</td>
+                              <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                              <td style="text-align:center" *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div> -->
+
+            </div>
+          </div>
+          <!-- ///////////////// -->
+          <div class="col-md-6">
+            <div class="table-responsive" *ngIf="ReportData">
+              <table class="table table-bordered freeFormReportTable font-12">
+                <thead class="thead-light2">
+                  <tr>
+                    <th>Contraente</th>
+                    <th>Contratto</th>
+                    <th>KPI</th>
+                    <th>Granularità dei dati</th>
+                    <th>Data di Calcolo</th>
+                    <th>Stato del Calcolo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ ReportDetailsData1.contractparty }} </td>
+                    <td>{{ ReportDetailsData1.contract }} </td>
+                    <td>{{ ReportDetailsData1.rule }} </td>
+                    <td>{{ ReportDetailsData1.datagranularity }} </td>
+                    <td>{{ ReportDetailsData1.calculationstatuslastdate }}</td>
+                    <td>{{ ReportDetailsData.calculationstatustext }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <br>
+              
+              <div class="row">
+                <h6 class="ml-3" style="color:#565656">Periodo:</h6>
+                <select [(ngModel)]="dayDrillPeriod2" class="form-control ml-2" style="width:17%;margin-top:-8px" (change)="selectedPeriod2()">
+                  <!-- <option value="">Select</option> -->
+                  <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary btn-sm float-right" (click)="chartClicked2()"><i class="fa fa-table"></i></button>
+              <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions2" [(update)]="chartUpdateFlag2"
+              [oneToOne]="true" class="w-100p d-block four">
+              </highcharts-chart><br><br>
+
+              <!-- <h5 *ngIf='loadingModalDati2' id="loader" class="text-center">
+                <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+              </h5>
+              <div [hidden]="isLoadedDati2==0" class="table-responsive" style="background: #ffffff; padding: 10px">
+                <select [(ngModel)]="monthVar2" class="form-control ml-1" style="width:25%;" (change)="selectedMonth2($event)">
+                  <option *ngFor="let month2 of months2; index as i" value={{i+1}}>{{month2}}</option>
+                </select><br> 
+                <table id="classTable" class="table table-bordered" #table>
+                      <thead style="background: #20a8d8; color:white">
+                          <tr>
+                              <th style="text-align:center">create date</th>
+                              <th style="text-align:center">modify date</th>
+                              <th style="text-align:center">raw data id</th>
+                              <th style="text-align:center" [hidden]="!showEventCol">event type</th>
+                              <th style="text-align:center">resource</th>
+                              <th style="text-align:center">time stamp</th>
+                              <th style="text-align:center">reader id</th>
+                              <th style="text-align:center">event state id</th>
+                              <th style="text-align:center">partner raw_data id</th>
+                              <th *ngFor="let key of countCampiData" style="text-align:center">campo {{key}}</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngIf="fitroDataById2.length==0">
+                              <td class="font-italic text-center" colspan="12">
+                                  Nessun dato per il periodo selezionato
+                              </td>
+                          </tr>
+                          <tr *ngFor="let rec of fitroDataById2; index as i">
+                              <td style="text-align:center">{{rec.create_date }}</td>
+                              <td style="text-align:center">{{rec.modify_date }}</td>
+                              <td style="text-align:center">{{rec.raw_data_id}}</td>
+                              <td style="text-align:center" [hidden]="!showEventCol">{{rec.event_type_id}}</td>
+                              <td style="text-align:center">{{rec.resource_id}}</td>
+                              <td style="text-align:center">{{rec.time_stamp }}</td>
+                              <td style="text-align:center">{{rec.reader_id}}</td>
+                              <td style="text-align:center">{{rec.event_state_id}}</td>
+                              <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                              <td style="text-align:center" *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>               -->
+            </div>
+          </div> 
+          
+          <div class="col-md-12">
+            <highcharts-chart [hidden]="isDayDrill==0" [Highcharts]="highcharts" [options]="dayChartOptions" [(update)]="dayChartUpdateFlag"
+            [oneToOne]="true" style="width: 100%; display: block;">
+            </highcharts-chart><br><br>
+          </div>
+
+          <h5 *ngIf='loadingModalDati' id="loader" class="text-center">
+            <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+          </h5>
+          <div [hidden]="isLoadedDati==0" class="table-responsive" style="background: #ffffff; padding: 10px">
+            <div class="row">
+              <h5 class="ml-2" style="color:#565656;">Periodo:</h5>
+              <select [(ngModel)]="monthVar" class="form-control ml-2" style="width:15%;" (change)="selectedMonth($event)">
+                <!-- <option value="">Select</option> -->
+                <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+              </select>
+              <h6 class="float-right" style="color:#565656; margin-left: 90%; margin-top: -2%">{{selectedmonth}}/{{selectedyear}}</h6>
+            </div><br> 
+              <table id="classTable" class="table table-bordered font-12" #table>
+                  <thead class="thead-light2">
+                      <tr>
+                          <th style="text-align:center">create date</th>
+                          <th style="text-align:center">modify date</th>
+                          <th style="text-align:center">raw data id</th>
+                          <th style="text-align:center" [hidden]="!showEventCol">event type</th>
+                          <th style="text-align:center">resource</th>
+                          <th style="text-align:center">time stamp</th>
+                          <th style="text-align:center">reader id</th>
+                          <th style="text-align:center">event state id</th>
+                          <th style="text-align:center">partner raw_data id</th>
+                          <th *ngFor="let key of countCampiData" style="text-align:center">campo {{key}}</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngIf="fitroDataById.length==0">
+                          <td class="font-italic text-center" colspan="12">
+                              Nessun dato per il periodo selezionato
+                          </td>
+                      </tr>
+                      <tr *ngFor="let rec of fitroDataById; index as i">
+                          <td style="text-align:center">{{rec.create_date }}</td>
+                          <td style="text-align:center">{{rec.modify_date }}</td>
+                          <td style="text-align:center">{{rec.raw_data_id}}</td>
+                          <td style="text-align:center" [hidden]="!showEventCol">{{rec.event_type_id}}</td>
+                          <td style="text-align:center">{{rec.resource_id}}</td>
+                          <td style="text-align:center">{{rec.time_stamp }}</td>
+                          <td style="text-align:center">{{rec.reader_id}}</td>
+                          <td style="text-align:center">{{rec.event_state_id}}</td>
+                          <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                          <td style="text-align:center" *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+
+
+          <h5 *ngIf='loadingModalDati2' id="loader" class="text-center">
+            <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+          </h5>
+          <div [hidden]="isLoadedDati2==0" class="table-responsive" style="background: #ffffff; padding: 10px">
+            <div class="row">
+              <h5 class="ml-2" style="color:#565656;">Periodo:</h5>
+              <select [(ngModel)]="monthVar2" class="form-control ml-2" style="width:15%;" (change)="selectedMonth2($event)">
+                <!-- <option value="">Select</option> -->
+                <option *ngFor="let month2 of months2; index as i" value={{month2}}>{{month2}}</option>
+              </select>
+              <h6 class="float-right" style="color:#565656; margin-left: 90%; margin-top: -2%">{{selectedmonth}}/{{selectedyear}}</h6>
+            </div><br> 
+            <table id="classTable" class="table table-bordered font-12" #table>
+                  <thead class="thead-light2">
+                      <tr>
+                          <th style="text-align:center">create date</th>
+                          <th style="text-align:center">modify date</th>
+                          <th style="text-align:center">raw data id</th>
+                          <th style="text-align:center" [hidden]="!showEventCol">event type</th>
+                          <th style="text-align:center">resource</th>
+                          <th style="text-align:center">time stamp</th>
+                          <th style="text-align:center">reader id</th>
+                          <th style="text-align:center">event state id</th>
+                          <th style="text-align:center">partner raw_data id</th>
+                          <th *ngFor="let key of countCampiData" style="text-align:center">campo {{key}}</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngIf="fitroDataById2.length==0">
+                          <td class="font-italic text-center" colspan="12">
+                              Nessun dato per il periodo selezionato
+                          </td>
+                      </tr>
+                      <tr *ngFor="let rec of fitroDataById2; index as i">
+                          <td style="text-align:center">{{rec.create_date }}</td>
+                          <td style="text-align:center">{{rec.modify_date }}</td>
+                          <td style="text-align:center">{{rec.raw_data_id}}</td>
+                          <td style="text-align:center" [hidden]="!showEventCol">{{rec.event_type_id}}</td>
+                          <td style="text-align:center">{{rec.resource_id}}</td>
+                          <td style="text-align:center">{{rec.time_stamp }}</td>
+                          <td style="text-align:center">{{rec.reader_id}}</td>
+                          <td style="text-align:center">{{rec.event_state_id}}</td>
+                          <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                          <td style="text-align:center" *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+
+
+        </div>
+        <!-- <div *ngFor="let row of ReportDetailsData; index as i">
+          <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions" [(update)]="chartUpdateFlag"
+            [oneToOne]="true" style="width: 100%; display: block;">
+          </highcharts-chart><br>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- modal end -->

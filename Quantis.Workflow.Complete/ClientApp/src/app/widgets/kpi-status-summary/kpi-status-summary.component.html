@@ -1,0 +1,28 @@
+<p class="float-left no-drag">
+    <input type="text" *ngIf="isDashboardModeEdit" [(ngModel)]="widgetname" (ngModelChange)="widgetnameChange($event)" />
+    <span *ngIf="!isDashboardModeEdit"> {{ widgetname }}</span>
+</p>
+<div class="clearfix"></div>
+<div class="spinner-grow text-primary text-center" *ngIf="loading" role="status" style="color:#eedc00 !important">
+    <span class="sr-only">Caricamento...</span>
+</div>
+<div class="table-responsive" style="height:100%;display:flex;width:100%">
+    <table class="table table-bordered table-striped" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" style="height:100%;width:100%">
+        <thead class="thead-light2">
+            <tr>
+                <th style="padding: 1px 2px;">Cliente</th>
+                <th style="padding: 1px 2px;">Contratto</th>
+                <th style="padding: 1px 2px;">KPI</th>
+                <th style="padding: 1px 2px;">Aggiornato al</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let kpiStatus of kpiStatusSummaryData">
+                <td style="padding: 1px 2px;">{{ kpiStatus.cliente }}</td>
+                <td style="padding: 1px 2px;">{{ kpiStatus.contratto }}</td>
+                <td style="padding: 1px 2px;text-align:center">{{ kpiStatus.kpi }}</td>
+                <td style="padding: 1px 2px;text-align:center">{{ kpiStatus["aggiornato al"] }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

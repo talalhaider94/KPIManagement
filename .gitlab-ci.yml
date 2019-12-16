@@ -1,0 +1,23 @@
+stages:
+    - build
+    
+before_script:
+    - "ls"
+    - "dotnet restore"
+
+build:
+    stage: build
+    only:
+        - schedules
+    script:
+        - "rm -rf /opt/WorkFlowAPI/DotnetPublish/"
+        - "dotnet publish -c Release -o /opt/WorkFlowAPI/DotnetPublish/"
+        - "systemctl stop supervisord"
+        - "rm -rf /opt/WorkFlowAPI/dotnetcore_modules_backup"
+        - "mv /opt/WorkFlowAPI/dotnetcore_modules /opt/WorkFlowAPI/dotnetcore_modules_backup"
+        - "mkdir /opt/WorkFlowAPI/dotnetcore_modules" 
+        - "cp -a /opt/WorkFlowAPI/DotnetPublish/. /opt/WorkFlowAPI/dotnetcore_modules/"
+        - "rm -rf /opt/WorkFlowAPI/dotnetcore_modules/ClientApp/dist"
+        - "mkdir /opt/WorkFlowAPI/dotnetcore_modules/ClientApp/dist"
+        - "cp -a /opt/WorkFlowAPI/DotnetPublish/ClientApp/dist/. /opt/WorkFlowAPI/dotnetcore_modules/ClientApp/dist"
+        - "systemctl start supervisord"

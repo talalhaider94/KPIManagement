@@ -1,0 +1,45 @@
+<p class="float-left no-drag" *ngIf="editWidgetName">
+    <input type="text" [(ngModel)]="widgetname" (ngModelChange)="widgetnameChange($event)" />
+</p>
+<!-- <h6 class="ml-1" style="color:#565656">Periodo:</h6>
+<select [(ngModel)]="dayDrillPeriod" class="form-control ml-2" style="width:9%;margin-top:-8px" (change)="selectedPeriod()">
+<option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+</select> -->
+<button type="button" [disabled]="loading" *ngIf="!editWidgetName"
+    class="no-drag btn-sm btn btn-primary float-right" (click)="openDrillDownTable()">
+    <i class="fa fa-table"></i>
+</button>
+<button type="button" [disabled]="loading" *ngIf="!editWidgetName"
+    class="no-drag btn-sm btn btn-primary float-right mr-1" (click)="openDayDrillDownTable()">
+    Day Drill Down
+</button>
+<button type="button" [disabled]="loading" *ngIf="!editWidgetName"
+    class="no-drag btn-sm btn btn-primary float-right mr-1" (click)="openModal()">
+    <i class="fa fa-cog"></i>
+</button>
+<div class="clearfix"></div>
+<div class="spinner-grow text-primary" *ngIf="loading" role="status">
+    <span class="sr-only">Loading...</span>
+</div>
+
+<div [ngClass]="groupReportCheck ? 'd-block float-left w-50p' : 'w-100p d-block'">
+    <p class="mb-0 font-12"><b>Contract Parties:</b> {{ contractParties }}</p>
+    <p class="mb-0 font-12"><b>Contracts:</b> {{ contracts }}</p>
+    <p class="mb-0 font-12"><b>KPI:</b> {{ kpi }}</p>
+    <p class="font-12 mb-0"><b>Periodo:</b> {{ period || 'N/A' }}</p>
+    <p class="font-12 mb-0" *ngIf="incompletePeriod">Priodo Incompleto</p>
+    <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions" [(update)]="chartUpdateFlag" [oneToOne]="true"
+        class="w-100p d-block" (click)="chartClicked($event)">
+    </highcharts-chart>
+</div>
+<div [ngClass]="groupReportCheck ? 'd-block float-right w-50p' : 'd-none'">
+    <p class="mb-0 font-12"><b>Contract Parties:</b> {{ contractParties1 }}</p>
+    <p class="mb-0 font-12"><b>Contracts:</b> {{ contracts1 }}</p>
+    <p class="mb-0 font-12"><b>KPI:</b> {{ kpi1 }}</p>
+    <p class="font-12 mb-0"><b>Periodo:</b> {{ period || 'N/A' }}</p>
+    <p class="font-12 mb-0" *ngIf="incompletePeriod">Priodo Incompleto</p>
+    <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions1" [(update)]="chartUpdateFlag1"
+        [oneToOne]="true" class="w-100p d-block">
+    </highcharts-chart>
+</div>
+<div class="clearfix"></div>

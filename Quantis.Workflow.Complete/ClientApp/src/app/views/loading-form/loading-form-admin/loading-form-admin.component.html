@@ -1,0 +1,150 @@
+<div *ngIf='loading' id="loader" class="text-center">
+    <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+</div>
+
+<div>
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 text-center">
+                <h2>{{title}}</h2>
+            </div>
+            <div class="col-sm-10">
+                <form [formGroup]="myInputForm" novalidate (ngSubmit)="save(myInputForm)">
+                    <div formArrayName="valories">
+                        <div *ngFor="let language of myInputForm.get('valories')['controls']; let i=index"
+                             class="panel panel-default">
+                            <div *ngIf="arrayFormElements.length > 0 && arrayFormElements[i].type=='time' && arrayFormElements[i].type!='Label'"
+                                 class="panel-body" [formGroupName]="i">
+                                <div class="row justify-content-center" id="divDate">
+                                    <div class="col-sm-7 bg-white p-3">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <mat-label>
+                                                    <strong>{{arrayFormElements[i].name}}</strong> ({{arrayFormElements[i].type}})
+                                                </mat-label>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>min Date</mat-label>
+                                                    <input matInput [(ngModel)]="minDate[i]" [matDatepicker]="pickerb" [max]="maxDate[i]"
+                                                           formControlName="valoreMin">
+                                                    <mat-datepicker-toggle matSuffix [for]="pickerb"></mat-datepicker-toggle>
+                                                    <mat-datepicker #pickerb></mat-datepicker>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>max Date</mat-label>
+                                                    <input matInput [(ngModel)]="maxDate[i]" [min]="minDate[i]" [matDatepicker]="pickera"
+                                                           formControlName="valoreMax">
+                                                    <mat-datepicker-toggle matSuffix [for]="pickera"></mat-datepicker-toggle>
+                                                    <mat-datepicker #pickera></mat-datepicker>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="arrayFormElements.length > 0 && arrayFormElements[i].type!='time' && arrayFormElements[i].type!='Label'"
+                                 class="panel-body" [formGroupName]="i">
+                                <div class="row justify-content-center">
+                                    <div class="col-sm-7">
+                                        <div class="row bg-white p-3">
+                                            <div class="col-sm-12">
+                                                <mat-label>
+                                                    <strong>{{arrayFormElements[i].name}}</strong> ({{arrayFormElements[i].type}})
+                                                </mat-label>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>
+                                                        {{arrayFormElements[i].type === 'string' ? 'lunghezza minina' : 'inserisci numero minimo' }}
+                                                    </mat-label>
+                                                    <input matInput [max]="numeroMax[i]" [(ngModel)]="numeroMin[i]" type="number" placeholder="Input"
+                                                           formControlName="valoreMin">
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>
+                                                        {{arrayFormElements[i].type === 'string' ? 'lunghezza massima' : 'inserisci numero massimo' }}
+                                                    </mat-label>
+                                                    <input matInput [min]="numeroMin[i]" [(ngModel)]="numeroMax[i]" type="number" placeholder="Input"
+                                                           formControlName="valoreMax">
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div formArrayName="campiConfronto" class="panel panel-default admin-form-rules">
+                        <p><b>Per ogni modifica selezionare prima il campo 1</b></p>
+                        <div *ngFor="let language of myInputForm.get('campiConfronto')['controls']; let i=index"
+                             class="panel-body bg-white">
+                            <div class="row align-items-center justify-content-center" [formGroupName]="i">
+                                <div class="col-sm-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-select [placeholder]="comparisonField1[i] ? comparisonField1[i].name : 'Campo 1' " formControlName="campo1" [(value)]="comparisonField1[i]" [(ngModel)]="comparisonField1[i]"
+                                                    (selectionChange)="filtraElementi($event.value,i)" disableRipple>
+                                            <!-- <mat-option [value]="defaultFont[0].campo1" selected="selected">{{defaultFont[0].campo1.Name}}
+                                            </mat-option> -->
+                                            <mat-option *ngFor="let element of arrayFormElements " [value]="element">
+                                                {{element.name}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-select [placeholder]="comparisonField2[i] ? comparisonField2[i] : 'Segno'" formControlName="segno" [(ngModel)]="comparisonField2[i]" disableRipple
+                                                    [disabled]="((confronti[i]!=null && confronti[i].length==0)||(confronti[i]==null))">
+                                            <mat-option *ngFor="let element of confronti[i] " [value]="element">{{element}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <mat-form-field appearance="outline">
+                                        <mat-select formControlName="campo2" disableRipple [(ngModel)]="comparisonField3[i]"
+                                                    [disabled]="((arraySecondo[i]!=null && arraySecondo[i].length==0)||(arraySecondo[i]==null))"
+                                                    [placeholder]="comparisonField3[i] ? comparisonField3[i].name : 'Campo 2'">
+                                            <!-- <mat-option [value]="defaultFont[0].campo2" selected="selected">{{defaultFont[0].campo2.Name}}
+                                            </mat-option> -->
+                                            <mat-option *ngFor="let element of arraySecondo[i]" [value]="element">
+                                                {{element.name}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="col-sm-1 text-center">
+                                    <a class="btn btn-danger btn-sm text-white" (click)="removeComparisonForm(i)"
+                                       *ngIf="myInputForm.get('valories')['controls'].length > 1">
+                                        <span class="fa fa-trash"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="margin-20">
+                        <a (click)="addComparisonForm('')" style="cursor: pointer">
+                            Aggiungi regola +
+                        </a>
+                    </div>
+                    <div class="row mb-3 align-items-center pt-3">
+                        <div class="col-sm-5 offset-sm-7 text-right">
+                            <button type="submit" class="btn btn-primary">
+                                <span *ngIf="loading" class="fa fa-spinner fa-spin"></span>Salva
+                            </button>
+                            <a [routerLink]="['/loading-form/admin']" class="btn btn-primary text-white">Annulla</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

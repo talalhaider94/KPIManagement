@@ -1,0 +1,309 @@
+<div *ngIf='loading || formElementsLoading' id="loader" class="text-center">
+    <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+</div>
+<div>
+    <div class="container" style="max-width:100%">
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-6">
+                        <p class="alert alert-info" *ngIf="!readOnlyUserForm">
+                            CutOff attivo dal giorno: {{ day_cutoff }} <br /> E' possibile solamente eseguire il download degli
+                            allegati.
+                        </p>
+                        <span *ngIf='displayComparisonRules.length > 0'>
+                            <button type="button" class="btn btn-primary btn-sm mb-2" (click)="isCollapsed = !isCollapsed"
+                                    [attr.aria-expanded]="!isCollapsed" aria-controls="collapseBasic">
+                                Regole di confronto +
+                            </button>
+                            <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
+                                <div class="well well-lg card card-block card-header">
+                                    <ul class="pl-3 mb-1">
+                                        <li *ngFor="let camp of displayComparisonRules">{{ camp }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7">
+                <div class="card">
+                    <div class="card-header">
+                        <strong>{{jsonForm.description || title}}</strong>
+                    </div>
+                    <div class="container" style="background:#eedc00">
+                        <div *ngFor="let control of myInputForm.get('valories')['controls']; let i=index"
+                             class="panel panel-default">
+                            <div *ngIf="arrayFormElements.length > 0 && arrayFormElements[i].type=='Label'" class="panel-body ">
+                                <div class="row align-items-center ">
+                                    <div class="col-md-12 ">
+                                        <small><b><i style="color:#0047bb">{{arrayFormElements[i].source}}</i></b></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                        <ul class="bg-danger pt-2 pb-2" *ngIf="userLoadingFormErrors.length > 0">
+                            <li *ngFor="let error of userLoadingFormErrors"> {{ error }}</li>
+                        </ul>
+                        <form [formGroup]="myInputForm" novalidate (ngSubmit)="saveUser(myInputForm)">
+
+                            <div formArrayName="valories">
+
+                                <div *ngFor="let control of myInputForm.get('valories')['controls']; let i=index"
+                                     class="panel panel-default">
+                                    <div *ngIf="arrayFormElements.length > 0 && arrayFormElements[i].type=='time'"
+                                         class="panel-body bg-white" [formGroupName]="i">
+                                        <div class="row align-items-center mb-2">
+                                            <div class="col-md-5 col-form-label">
+                                                <div *ngIf="arrayFormElements[i].label.length > 0; then trueBlock else falseBlock"></div>
+                                                <ng-template #trueBlock><label><span *ngIf="arrayFormElements[i].mandatory == 'yes'"><b style="color:red">*</b></span><b>{{arrayFormElements[i].label}}</b></label></ng-template>
+                                                <ng-template #falseBlock><label><span *ngIf="arrayFormElements[i].mandatory == 'yes'"><b style="color:red">*</b></span>{{arrayFormElements[i].name}}</label></ng-template>
+                                            </div>
+                                            <div class="col-sm-7">
+                                                <!-- <input type="date" [(ngModel)]="dt[i]" [min]="minDate[i]" [max]="maxDate[i]"
+                                                placeholder="inserisci data" class="form-control" formControlName="valoreUtente"> -->
+                                                <mat-form-field appearance="outline" [ngClass]="{'disable-datepicker': !readOnlyUserForm}">
+                                                    <mat-label>Data</mat-label>
+                                                    <input matInput [(ngModel)]="dt[i]" [min]="minDate[i]" [max]="maxDate[i]"
+                                                           [matDatepicker]="pickera" formControlName="valoreUtente" [readonly]="!readOnlyUserForm"
+                                                           [disabled]="!readOnlyUserForm" [required]="arrayFormElements[i].mandatory == 'yes'">
+                                                    <mat-datepicker-toggle matSuffix [for]="pickera" [disabled]="!readOnlyUserForm">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #pickera [disabled]="!readOnlyUserForm"></mat-datepicker>
+                                                </mat-form-field>
+                                                <div class="row">
+                                                    <div class="col-sm-6" *ngIf="minDate[i]!==undefined && minDate[i].length > 0">
+                                                        <small style="color:red">Data minima: {{minDate[i]|date}}</small>
+                                                    </div>
+                                                    <div class="col-sm-6" *ngIf="maxDate[i]!==undefined && maxDate[i].length > 0">
+                                                        <small style="color:red">Data massima: {{maxDate[i]|date}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="arrayFormElements.length > 0 && arrayFormElements[i].type!='time'"
+                                         class="panel-body bg-white" [formGroupName]="i">
+                                        <div class="row align-items-center mb-2">
+                                            <div class="col-md-5 col-form-label"
+                                                 *ngIf="(arrayFormElements[i].type ==='real' || arrayFormElements[i].type ==='string' || arrayFormElements[i].type ==='integer') && arrayFormElements[i].name != 'Is_Dato_Mancante'">
+                                                <div *ngIf="arrayFormElements[i].label.length > 0; then trueBlock else falseBlock"></div>
+                                                <ng-template #trueBlock><label><span *ngIf="arrayFormElements[i].mandatory == 'yes'"><b style="color:red">*</b></span><b>{{arrayFormElements[i].label}}</b></label></ng-template>
+                                                <ng-template #falseBlock><label><span *ngIf="arrayFormElements[i].mandatory == 'yes'"><b style="color:red">*</b></span>{{arrayFormElements[i].name}}</label></ng-template>
+                                            </div>
+                                            <div class="col-sm-7">
+
+                                                <input [readonly]="!readOnlyUserForm" [required]="arrayFormElements[i].mandatory == 'yes'"
+                                                       *ngIf="arrayFormElements[i].type=='string' && arrayFormElements[i].defaultvalue.length === 0"
+                                                       [attr.maxlength]="numeroMax[i]" [attr.minlength]="numeroMin[i]" [(ngModel)]="stringa[i]"
+                                                       placeholder="Input" class="form-control" formControlName="valoreUtente">
+
+                                                <input [readonly]="!readOnlyUserForm" [required]="arrayFormElements[i].mandatory == 'yes'"
+                                                       *ngIf="arrayFormElements[i].type=='string' && arrayFormElements[i].defaultvalue.length > 0"
+                                                       [attr.maxlength]="numeroMax[i]" [attr.minlength]="numeroMin[i]"
+                                                       [(ngModel)]="stringa[i] = arrayFormElements[i].defaultvalue"
+                                                       value='{{arrayFormElements[i].defaultvalue}}' placeholder="Input" class="form-control"
+                                                       formControlName="valoreUtente" disabled>
+
+                                                <input [readonly]="!readOnlyUserForm" type="number" [required]="arrayFormElements[i].mandatory == 'yes'"
+                                                       *ngIf="(arrayFormElements[i].type=='real' || arrayFormElements[i].type=='integer') && arrayFormElements[i].defaultvalue.length === 0 && arrayFormElements[i].name != 'Is_Dato_Mancante'"
+                                                       [attr.maxlength]="numeroMax[i]" [attr.minlength]="numeroMin[i]" [(ngModel)]="numero[i]"
+                                                       placeholder="Input" class="form-control" formControlName="valoreUtente">
+
+                                                <input [readonly]="!readOnlyUserForm" type="number" [required]="arrayFormElements[i].mandatory == 'yes'"
+                                                       *ngIf="(arrayFormElements[i].type=='real' || arrayFormElements[i].type=='integer') && arrayFormElements[i].defaultvalue.length > 0 && arrayFormElements[i].name != 'Is_Dato_Mancante'"
+                                                       [attr.maxlength]="numeroMax[i]" [attr.minlength]="numeroMin[i]"
+                                                       [(ngModel)]="numero[i] = arrayFormElements[i].defaultvalue"
+                                                       value='{{arrayFormElements[i].defaultvalue}}' placeholder="Input" class="form-control"
+                                                       formControlName="valoreUtente" disabled>
+                                                <div class="row"
+                                                     *ngIf="arrayFormElements[i].type=='string' || arrayFormElements[i].type=='real'">
+                                                    <div class="col-sm-6" *ngIf="numeroMin[i]!==undefined && numeroMin[i] > 0">
+                                                        <small style="color:red">Valore minimo: {{numeroMin[i]}}</small>
+                                                    </div>
+                                                    <div class="col-sm-6" *ngIf="numeroMax[i]!==undefined && numeroMax[i] > 0">
+                                                        <small style="color:red">Valore massimo: {{numeroMax[i]}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3 align-items-center">
+                                <div class="col-sm-12" *ngIf="displayUserFormCheckBox">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" formControlName="termsCheck" [(ngModel)]="Is_Dato_Mancante" value="true" (change)="onCheck()">
+                                        <label class="form-check-label" for="inline-checkbox1"><b>Nessun Evento</b></label><!--Dati non Pervenuti-->
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-sm-6 text-right" *ngIf="readOnlyUserForm">
+                                  <button type="submit" class="btn btn-primary" (click)="after_submit('saveExit')"
+                                          [disabled]="!myInputForm.valid || loading || formElementsLoading">
+                                    <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Salva
+                                  </button>
+                                  <button type="submit" class="btn btn-primary" (click)="after_submit('save')"
+                                          [disabled]="!myInputForm.valid || loading || formElementsLoading">
+                                    <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Salva e Continua
+                                  </button>
+
+                                  <a [ngClass]="{'disabled': loading}" [routerLink]="['/loading-form/utente-notracking']"
+                                     class="btn btn-danger text-white">Annulla</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-outline bg-white">
+                        <thead class="thead-light2">
+                            <tr>
+                                <th>Contratto</th>
+                                <th>Nome KPI</th>
+                                <th>Target</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf='listaKpiPerForm.length === 0'>
+                                <td colspan="3">Nessun KPI Assegnato al Loading Form</td>
+                            </tr>
+                            <tr *ngFor='let kpi of listaKpiPerForm'>
+                                <td>{{kpi.contract}}</td>
+                                <td>{{kpi.id_kpi}} - {{kpi.kpi_name_bsi}}</td>
+                                <td>{{kpi.target}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Documenti Presenti</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label for="ccmonth">Mese</label>
+                                <select class="form-control" name="monthOption" [(ngModel)]="monthOption" (change)="onDataChange()">
+                                    <option value="01">1</option>
+                                    <option value="02">2</option>
+                                    <option value="03">3</option>
+                                    <option value="04">4</option>
+                                    <option value="05">5</option>
+                                    <option value="06">6</option>
+                                    <option value="07">7</option>
+                                    <option value="08">8</option>
+                                    <option value="09">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="ccyear">Anno</label>
+                                <select class="form-control" name="yearOption" [(ngModel)]="yearOption" (change)="onDataChange()">
+                                    <option *ngFor="let year of anni">{{year}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--/.row-->
+                        <div *ngIf='loadingAttachments' class="text-center mb-3">
+                            <span class="fa fa-spin fa-spinner fa-2x text-primary"></span>
+                        </div>
+                        <table class="table table-responsive-sm table-hover table-outline mb-3 text-center">
+                            <thead class="thead-light2">
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Periodo</th>
+                                    <th>Nome File</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="formAttachmentsArray.length === 0">
+                                    <td colspan="4">Nessun Documento presente</td>
+                                </tr>
+                                <tr *ngFor="let attachment of formAttachmentsArrayFiltered">
+                                    <td>{{ attachment.create_date | date: 'dd/MM/yyyy, h:mm a' || 'N/A' }}</td>
+                                    <td>{{ attachment.period }}/{{ attachment.year }}</td>
+                                    <td>{{ attachment.doc_name }}</td>
+                                    <td>
+                                        <a (click)="downloadFile(attachment.content, attachment.doc_name)">
+                                            <i class="fa fa-download text-primary"></i>
+                                        </a>
+                                        <!-- <a href="data:application/pdf;base64,{{attachment.content}} | safe: 'resourceUrl'" target="_blank" download><i
+                                            class="fa fa-download"></i></a> -->
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="bg-white pt-2 pb-2 mb-5" *ngIf="readOnlyUserForm">
+                    <div class="col-sm-12 mb-3 file-container">
+                        <h5>File Allegati</h5>
+                        <input type="file" class="my-custom-file-field" ng2FileSelect [uploader]="uploader" multiple
+                               (change)="onFileSelected($event)" /><br />
+                    </div>
+
+                    <div class="col-sm-12">
+                        <h5>Elenco dei File</h5>
+                        <table class="table table-responsive-sm table-hover table-outline mb-3">
+                            <thead class="thead-light2">
+                                <tr>
+                                    <th class="width-100">Nome File</th>
+                                    <th>Mese</th>
+                                    <th>Anno</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="uploader.queue.length === 0">
+                                    <td colspan="4">nessun file da caricare</td>
+                                </tr>
+                                <tr *ngFor="let item of uploader.queue; let i=index">
+                                    <td class="width-100">{{ item?.file?.name }}</td>
+                                    <td>
+                                        <select class="form-control" name="fileUploadMonth" [(ngModel)]="fileUploadMonth[i]">
+                                            <option value="01">1</option>
+                                            <option value="02">2</option>
+                                            <option value="03">3</option>
+                                            <option value="04">4</option>
+                                            <option value="05">5</option>
+                                            <option value="06">6</option>
+                                            <option value="07">7</option>
+                                            <option value="08">8</option>
+                                            <option value="09">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="fileUploadYear" [(ngModel)]="fileUploadYear[i]">
+                                            <option *ngFor="let year of anni">{{year}}</option>
+                                        </select>
+                                    </td>
+                                    <td nowrap>
+                                        <button type="button" class="btn btn-danger btn-sm" (click)="item.remove()">
+                                            <span class="fa fa-trash"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" [disabled]="fileUploading" class="btn btn-primary" (click)="fileUploadUI()">
+                            <span class="fa fa-upload" *ngIf="!fileUploading"></span>
+                            <span class="fa fa-spinner fa-spin" *ngIf="fileUploading"></span> Carica
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

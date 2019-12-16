@@ -1,0 +1,111 @@
+<div style="margin-top: -20px;">
+  <div class="table-responsive" style="background: #ffffff; padding: 10px">
+    <br>
+    <h2 style="color:#565656">CONFIGURAZIONI AVANZATE</h2><br>
+    <div class="row">
+      <!-- <input type="text" class="form-control ml-3" style="width:10%;" placeholder="Chiave" #searchCol1 /> -->
+      <button style="margin-left:90%" class="btn btn-success" data-toggle="modal"
+              data-target="#addConfigModal" (click)="showAddConfigModal()">
+        Crea Nuovo
+      </button>
+    </div><br />
+    <table class="table stripe" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+      <thead class="thead-light2">
+        <tr style="font-size:12px;color:white">
+          <th style="text-align:center">CHIAVE</th>
+          <th style="text-align:center">OWNER</th>
+          <th style="text-align:center">VALORE</th>
+          <th style="display:none; text-align:center">ABILITATO</th>
+          <th style="text-align:center">DESCRIZIONE</th>
+          <th style="text-align:center">AZIONE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of ConfigTableBodyData; index as i">
+          <td>{{row.key}}</td>
+          <td>{{row.owner}}</td>
+          <td>{{row.value}}</td>
+          <td style="display:none" align="center" *ngIf="row.isenable; then trueBlock else falseBlock"></td>
+          <ng-template #trueBlock><td style="display:none" align="center">&#10004;</td> </ng-template>
+          <ng-template #falseBlock><td style="display:none" align="center">&#10006;</td> </ng-template>
+          <td>{{row.description}}</td>
+          <td *ngIf="row.iseditable; then showEdit else hideEdit"></td>
+          <ng-template #showEdit>
+            <td style="text-align: center">
+              <button class="btn btn-primary" data-toggle="modal" (click)="populateModalData(row)"
+                      data-target="#configModal" style="font-size:10px">
+                <i class="fa fa-pencil"></i>
+              </button>
+            </td>
+          </ng-template>
+          <ng-template #hideEdit><td></td></ng-template>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div id="configModal" bsModal #configModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveModalLabel">Modifica la Configurazione</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideConfigModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table id="classTable" class="table table-bordered">
+          <thead class="thead-light2">
+            <tr>
+              <th>Key</th>
+              <th>Owner</th>
+              <th>Value</th>
+              <th style="display:none">Abilitato</th>
+              <th>Descrizione</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{modalData.key}}</td>
+              <td>{{modalData.owner}}</td>
+              <td><input type="text" class="form-control" [(ngModel)]="modalData.value"></td>
+              <td style="display:none"><input type="checkbox" class="form-control" [(ngModel)]="modalData.isenable" style="font-size:6px" /></td>
+              <td>{{modalData.description}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button (click)="updateConfig()" class="btn btn-success">Aggiorna</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideConfigModal()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="addConfigModal" bsModal #addConfigModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!--        <h5 class="modal-title" id="approveModalLabel">Modifica la Configurazione</h5>-->
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideAddConfigModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label><b>Nome Chiave</b></label><input type="text" class="form-control" placeholder="Nome Chiave" [(ngModel)]="key" /><br>
+        <label><b>Nome Owner</b></label><input type="text" class="form-control" placeholder="Nome Owner" [(ngModel)]="owner" /><br>
+        <label><b>Valore</b></label><input type="text" class="form-control" placeholder="Valore" [(ngModel)]="value" /><br>
+        <label><b>Abilitato</b></label><input style="text-align:left;width:3%" type="checkbox" class="form-control" [(ngModel)]="isenable" /><br>
+        <label><b>Descrizione</b></label><input type="text" class="form-control" placeholder="Descrizione" [(ngModel)]="description" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" (click)="addConfig()">Aggiungi</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideAddConfigModal()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>

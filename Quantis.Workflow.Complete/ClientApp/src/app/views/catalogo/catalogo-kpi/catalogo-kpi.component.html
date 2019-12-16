@@ -1,0 +1,295 @@
+<div style="margin-top: -25px; padding: 10px">
+    <br />
+    <div class="table-responsive" style="background: #ffffff; padding: 5px; height:100%; width: 100%;">
+        <br><h2 style="color:#565656">Catalogo KPI</h2><br>
+        <div class="row">
+            <input type="text" class="form-control ml-3 mr-1" style="width:15%;" placeholder="ID KPI" #searchCol1 [(ngModel)]="viewModel.filters.idKpi" name="idKpi" />
+            <input type="text" class="form-control ml-1 mr-1" style="width:15%;" placeholder="Titolo Breve" #searchCol2 [(ngModel)]="viewModel.filters.titoloBreve" name="titoloBreve" />
+            <input type="text" class="form-control ml-1 mr-1" style="width:15%;" placeholder="Referenti" #searchCol3 [(ngModel)]="viewModel.filters.referenti" name="referenti" />
+            <span>&nbsp;&nbsp;</span>
+            <select class="form-control" style="width:15%;" #searchCol4 [(ngModel)]="viewModel.filters.tuttiContratti" name="tuttiContratti"><option value="">Tutti i Contratti</option></select>
+            <span>&nbsp;&nbsp;</span>
+            <select class="form-control" style="width:15%;" #searchCol5 [(ngModel)]="viewModel.filters.tutteLeFrequenze" name="tutteLeFrequenze">
+                <option value="">Tutte le Frequenze</option>
+                <option value="MENSILE">MENSILE</option>
+                <option value="TRIMESTRALE">TRIMESTRALE</option>
+                <option value="QUADRIMESTRALE">QUADRIMESTRALE</option>
+                <option value="SEMESTRALE">SEMESTRALE</option>
+                <option value="ANNUALE">ANNUALE</option>
+            </select>
+            <span>&nbsp;&nbsp;</span>
+            <button class="ml-2" #btnExporta>Esporta CSV</button>
+            <!-- <button class="btn btn-primary ml-2" (click)="reload()">Refresh Table</button> -->
+        </div><br />
+              <div *ngIf="loading" class="text-center" id="loadingDiv">
+                <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+              </div>
+
+        <div class="top-scroll-container" #topScrollContainer>
+            <div #topScroll>&nbsp;</div>
+        </div>
+        <div class="top-scroll-table-container" #topScrollTblContainer>
+            <table class="table stripe kpiTable" #kpiTable id="kpiTable"  datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" style="width:100%">
+                <thead class="thead-light2">
+                  <tr style="color:white;font-size:12px;">
+                    <th style="text-align:center">CONTRATTO</th>
+                    <th style="text-align:center">ID</th>
+                    <th style="text-align:center">TITOLO BREVE</th>
+                    <th class="notExportCsv" style="text-align:center">KPI</th>
+                    <th style="text-align:center">CARICAMENTO</th>
+                    <th style="text-align:center">FREQUENZA</th>
+                    <th style="text-align:center">TARGET</th>
+                    <th style="text-align:center">ESCALATION</th>
+                    <th style="text-align:center">TIPO</th>
+                    <th style="text-align: center">FORNITURA</th>
+                    <th style="text-align: center">U.O.</th>
+                    <th style="text-align:center">A</th>
+                    <th style="text-align:center">R</th>
+                    <th style="text-align:center">W</th>
+                    <th class="notExportCsv" style="text-align:center">REFERENTI</th>
+
+                    <th class="notExportCsv" style="display:none;text-align:center"></th>
+                    <th class="notExportCsv" style="text-align:center">CALCOLO</th>
+                    <th class="notExportCsv" style="text-align:center"></th>
+                    <th class="notExportCsv" style="display:none;" width="0">hide</th>
+                    <th class="notExportCsv" style="display:none;" width="0">hide</th>
+                    <th style="display:none;">REFERENTI-0</th>
+                    <th style="display:none;">REFERENTI-1</th>
+                    <th style="display:none;">REFERENTI-2</th>
+                    <th style="display:none;">REFERENTI-3</th>
+                    <th style="display:none;">GLOBAL</th>
+                    <th style="display:none;">KPI_NAME</th>
+                    <th style="display:none;">FORM_NAME</th>
+                    <th style="display:none;">ID_FORM</th>
+                    <th style="display:none;">PROGRESSIVE</th>
+                    <th style="display:none;">CUTOFF_DAY</th>
+                    <th style="display:none;">WORKFLOW_DAY</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  <tr *ngFor="let row of kpiTableBodyData; index as i" style="font-size:12px">
+                    <td [ngClass]="isNumber(row.contract) ? 'rightAlign' : 'leftAlign'">{{row.contract_name}}</td>
+                    <td [ngClass]="isNumber(row.id_kpi) ? 'rightAlign' : 'leftAlign'">{{row.id_kpi}}</td>
+                    <td [ngClass]="isNumber(row.id_kpi) ? 'rightAlign' : 'leftAlign'">{{row.short_name}}</td>
+                    <td class="tagsTip notExportCsv" [ngClass]="isNumber(row.kpi_name_bsi) ? 'rightAlign' : 'leftAlign'" data-ext="" attr.data-ext="{{row.kpi_name_bsi}}">{{row.kpi_name_bsi | slice:0:130}} [...]</td>
+                    <td [ngClass]="isNumber(row.source_type) ? 'rightAlign' : 'leftAlign'">{{row.source_type}}</td>
+                    <td [ngClass]="isNumber(row.tracking_period) ? 'rightAlign' : 'leftAlign'">{{row.tracking_period}}</td>
+                    <td>{{row.target}}</td>
+                    <td>{{row.escalation}}</td>
+                    <td style="text-align:center">{{row.kpi_type}}</td>
+                    <td style="text-align:center">{{row.source_name}}</td>
+                    <td style="text-align:center">{{getOrganizationName(row.organization_unit)}}</td>
+                    <td class="" align="center" *ngIf="row.enable; then trueBlock else falseBlock"></td>
+                    <td class="notExportCsv" align="center" *ngIf="row.enable_rm; then trueBlock else falseBlock"></td>
+                    <td class="notExportCsv" align="center" *ngIf="row.enable_wf; then trueBlock else falseBlock"></td>
+                    <ng-template #trueBlock><td class="" align="center">&#10004;</td> </ng-template>
+                    <ng-template #falseBlock><td class="" align="center">&#10006;</td> </ng-template>
+
+                    <td class="notExportCsv" align="center"><button class="btn" data-toggle="modal" data-target="#referentiModal" (click)="populateModalData(row)"><i class="fa fa-user" style="font-size:20px;"></i></button></td>
+                    <td class="notExportCsv" style="display:none"></td>
+                    <td style="display:none;" align="center">{{row.referent}}</td>
+                    <td style="display:none;" align="center">{{row.referent_1}}</td>
+                    <td style="display:none;" align="center">{{row.referent_2}}</td>
+                    <td style="display:none;" align="center">{{row.referent_3}}</td>
+                    <td class="notExportCsv" align="center"><button class="btn" data-toggle="modal" data-target="#calcoloModal" (click)="coloBtn(row.kpi_computing_description)"><i class="fa fa-edit" style="font-size:20px;"></i></button></td>
+                    <td class="notExportCsv" align="center">
+                      <button style="font-size:10px" class="btn btn-primary" data-toggle="modal" (click)="populateKpiModalData(row)"
+                              data-target="#kpiModal">
+                        <i class="fa fa-pencil"></i>
+                      </button>
+                    </td>
+                    <td style="display:none;" width="0" class="notExportCsv">{{row.referent}},{{row.referent_1}},{{row.referent_2}},{{row.referent_3}}</td>
+                    <td class="notExportCsv" style="display:none;" width="0">{{row.kpi_name_bsi}}</td>
+                    <td style="display:none;">{{row.global_rule_id_bsi}}</td>
+                    <td style="display:none;">{{row.kpi_name_bsi}}</td>
+                    <td style="display:none;">{{row.form_name}}</td>
+                    <td style="display:none;">{{row.id_form}}</td>
+                    <td style="display:none;">{{row.progressive}}</td>
+                    <td style="display:none;">{{row.day_cutoff}}</td>
+                    <td style="display:none;">{{row.day_workflow}}</td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--/div>
+    </div-->
+</div>
+
+<div id="referentiModal" bsModal #referentiModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header" >
+          <!--        <h5 class="modal-title" id="approveModalLabel">Giustificativo</h5>-->
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideReferentiModal()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body" >
+          <div class="table-responsive" style="background: #ffffff; padding: 10px">
+            <table id="classTable" class="table stripe">
+              <thead class="thead-light2">
+              </thead>
+              <tbody>
+                <tr><th width="20%">REFERENTI_INPUT</th><td width="80%"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.referent"></td></tr>
+                <tr><th width="20%">REFERENTI_1</th><td width="80%"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.referent_1"></td></tr>
+                <tr><th width="20%">REFERENTI_2</th><td width="80%"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.referent_2"></td></tr>
+                <tr><th width="20%">REFERENTI_3</th><td width="80%"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.referent_3"></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button [disabled]="kpiButtonState !== '1'" (click)="updateKpi('referents')" class="btn btn-success">Aggiorna</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideReferentiModal()">Chiudi</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div id="calcoloModal" bsModal #calcoloModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Descrizione Calcolo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideCalcoloModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" disabled style="background:white">{{this.des}}</textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideCalcoloModal()">
+                    Chiudi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="kpiModal" bsModal #kpiModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="approveModalLabel">Modifica KPI</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideKpiModal()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div *ngIf="modalLoading" class="text-center" id="loadingMod">
+          <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+        </div>
+        <div class="modal-body" *ngIf="!modalLoading">
+          <div class="table-responsive" style="background: #ffffff; padding: 10px">
+            <table id="classTable" class="table stripe">
+              <thead class="thead-light2">
+              </thead>
+              <tbody>
+                <tr><th>CONTRAENTI</th><td><span *ngIf="modalData.primary_contract_party_name != 'Unknown'"><b>Primario: </b>[{{modalData.primary_contract_party}}] {{modalData.primary_contract_party_name}}</span></td><td><span *ngIf="modalData.secondary_contract_party_name != 'Unknow' && modalData.secondary_contract_party_name != null"><b>Secondario: </b>[{{modalData.secondary_contract_party}}] {{modalData.secondary_contract_party_name}}</span></td></tr>
+                <tr><th>CONTRATTO</th><td colspan="2">{{modalData.contract_name}}</td></tr>
+                <tr><th>CUTOFF</th><td><span *ngIf="modalData.day_cutoff != 'Unknown'"><b>Day: </b>{{modalData.day_cutoff}}</span></td><td><span *ngIf="modalData.day_workflow != 'Unknow'"><b>Workflow: </b>{{modalData.day_workflow}}</span></td></tr>
+                <tr><th>NOME KPI BSI</th><td colspan="2">[{{modalData.global_rule_id_bsi}}] {{modalData.kpi_name_bsi}}</td></tr>
+                <tr><th>DESCRIZIONE</th><td colspan="2"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.kpi_description"></td></tr>
+                <tr><th>CALCOLO</th><td colspan="2"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.kpi_computing_description"></td></tr>
+                <tr><th>ESCALATION</th><td colspan="2"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.escalation"></td></tr>
+                <tr><th>ID KPI</th><td colspan="2"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.id_kpi"></td></tr>
+                <tr><th>TITOLO BREVE</th><td colspan="2"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.short_name"></td></tr>
+                <tr>
+                  <th>UNITA ORGANIZZATIVA</th>
+                  <td colspan="2">
+                    <select [disabled]="kpiButtonState !== '1'" class="form-control" [(ngModel)]="modalData.organization_unit">
+                      <option value=""><- Nessuna Unità Organizativa -></option>
+                      <option *ngFor="let item of allOrganizationUnits " value="{{item.id}}">{{item.organization_unit}}</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <th>CARICAMENTO</th>
+                  <td colspan="2">
+                    <select [disabled]="kpiButtonState !== '1'" class="form-control" [(ngModel)]="modalData.source_type" name="source_type">
+                      <option value=""><- Nessun Caricamento -></option>
+                      <option value="AUTOMATICO">AUTOMATICO</option>
+                      <option value="MANUALE LF">MANUALE LOADING FORM</option>
+                      <option value="MANUALE CSV">MANUALE CSV</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr *ngIf="modalData.source_type == 'MANUALE LF'">
+                  <th>LOADING FORM</th>
+                  <td colspan="2">
+                    <select [disabled]="kpiButtonState !== '1'" class="form-control" [(ngModel)]="modalData.id_form">
+                      <option value=""><- Nessun Loading Form -></option>
+                      <option *ngFor="let item of allForms " value="{{item.form_id}}">{{item.form_name}}</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr *ngIf="modalData.source_type == 'MANUALE CSV'">
+                  <th>CSV FILE NAME</th>
+                  <td colspan="2">
+                    <input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.file_name">
+                  </td>
+                </tr>
+                <tr>
+                  <th>FREQUENZA</th>
+                  <td colspan="2">
+                    <select [disabled]="kpiButtonState !== '1'" class="form-control" [(ngModel)]="modalData.tracking_period" name="tracking_period">
+                      <option value=""><- Nessuna Frequenza -></option>
+                      <option value="MENSILE">MENSILE</option>
+                      <option value="TRIMESTRALE">TRIMESTRALE</option>
+                      <option value="QUADRIMESTRALE">QUADRIMESTRALE</option>
+                      <option value="SEMESTRALE">SEMESTRALE</option>
+                      <option value="ANNUALE">ANNUALE</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <th>TIPOLOGIA</th>
+                  <td colspan="2">
+                    <select [disabled]="kpiButtonState !== '1'" class="form-control" [(ngModel)]="modalData.kpi_type" name="kpi_type">
+                      <option value=""><- Nessuna Tipologia -></option>
+                      <option value="P">PENALE</option>
+                      <option value="M">MONITORAGGIO</option>
+                      <option value="O">OBIETTIVO</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <th>CATEGORIA</th>
+                  <td colspan="2">
+                    <select [disabled]="kpiButtonState !== '1'" class="form-control" [(ngModel)]="modalData.kpi_category" name="kpi_category">
+                      <option value="C">Contrattuale</option>
+                      <option value="O">Operativo</option>
+                      <option value="F">Finanziario</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr><th>FORNITURA</th><td colspan="2"><input [readonly]="kpiButtonState !== '1'" type="text" class="form-control" [(ngModel)]="modalData.source_name"></td></tr>
+                <tr><th>PROGRESSIVO</th><td colspan="2" style="text-align:center"><input [readonly]="kpiButtonState !== '1'" type="checkbox" [(ngModel)]="modalData.progressive" /></td></tr>
+              </tbody>
+            </table>
+            <table id="classTable" class="table stripe">
+              <thead class="thead-light2">
+              </thead>
+              <tbody>
+                <tr style="text-align:center"><th>ABILITATO</th><th>REMINDER</th><th>WORKFLOW</th></tr>
+                <tr>
+                  <td align="center"><input [disabled]="kpiButtonState !== '1'" type="checkbox" [(ngModel)]="modalData.enable" /></td>
+                  <td align="center"><input [disabled]="kpiButtonState !== '1' || modalData.enable == false" type="checkbox" [(ngModel)]="modalData.enable_rm" /></td>
+                  <td align="center"><input [disabled]="kpiButtonState !== '1' || modalData.enable == false" type="checkbox" [(ngModel)]="modalData.enable_wf" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button [disabled]="kpiButtonState !== '1'" (click)="updateKpi('kpi')" class="btn btn-success">Aggiorna</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideKpiModal()">Chiudi</button>
+        </div>
+      </div>
+    </div>
+</div>

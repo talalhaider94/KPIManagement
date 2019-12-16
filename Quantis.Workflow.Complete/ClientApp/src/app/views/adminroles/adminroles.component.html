@@ -1,0 +1,127 @@
+<div style="margin-top: -20px;">
+  <div class="table-responsive" style="background: #ffffff; padding: 10px">
+    <br>
+    <h2 style="color:#565656">Gestione Ruoli</h2><br>
+    <div class="row">
+      <!-- <input type="text" class="form-control ml-3" style="width:10%;" placeholder="Chiave" #searchCol1 /> -->
+      <button style="margin-left:15px" class="btn btn-success" data-toggle="modal"
+              data-target="#addConfigModal" (click)="showAddConfigModal()">
+        Aggiungi
+      </button>
+    </div><br />
+    <table class="table stripe" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+      <thead class="thead-light2">
+        <tr style="font-size:12px;color:white">
+          <th style="text-align:center">RUOLO</th>
+          <th style="text-align:center">AZIONE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of ConfigTableBodyData; index as i">
+          <td>{{row.name}}</td>
+          <td style="text-align: center">
+            <button class="btn btn-primary" data-toggle="modal" (click)="populateModalData(row)"
+                    data-target="#configModal" style="font-size:10px">
+              <i class="fa fa-pencil"></i>
+            </button>
+            <button class="btn btn-success" routerLink="adminRolePermissions/{{row.id}}/{{row.name}}" style="font-size:10px">
+              <i class="fa fa-pencil"></i> Permessi
+            </button>
+            <button class="btn btn-primary" data-toggle="modal" (click)="populateUsersData(row)"
+                    data-target="#usersModal" style="font-size:10px">
+              Utenti
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div id="addConfigModal" bsModal #addConfigModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveModalLabel">Nuovo Ruolo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideAddConfigModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label><b>Nome</b></label><input type="text" class="form-control" placeholder="RUOLO" [(ngModel)]="name" /><br>
+        <label><b>Codice</b></label><input type="text" class="form-control" placeholder="CODICE" [(ngModel)]="code" /><br>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" (click)="addRole()">Aggiungi</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideAddConfigModal()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="configModal" bsModal #configModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveModalLabel">Modifica Ruolo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideConfigModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table id="classTable" class="table table-bordered">
+          <thead class="thead-light2">
+          </thead>
+          <tbody>
+            <tr><th>NOME</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.name"></td></tr>
+            <tr><th>CODICE</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.code"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button (click)="updateConfig()" class="btn btn-success">Aggiorna</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideConfigModal()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="usersModal" bsModal #usersModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveModalLabel">Lista utenti del ruolo: {{modalData.name}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideUsersModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="txt-filter-user-div">
+          <input type="text" class="form-control" placeholder="Cerca"
+                 [(ngModel)]="filters.searchUsersText" />
+        </div><br>
+        <perfect-scrollbar style="max-height: 546px;">
+          <table class="table stripe">
+            <thead class="thead-light2">
+              <tr>
+                <th>Users</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of UsersTableBodyData | filter : filters.searchUsersText; index as i">
+                <td>{{row.userid}} - {{row.name}} {{row.surname}} [{{row.ca_bsi_account}}]</td>
+              </tr>
+            </tbody>
+          </table>
+        </perfect-scrollbar>
+      </div>
+      <div class="modal-footer">
+        <!-- <button (click)="updateConfig()" class="btn btn-success">Aggiorna</button> -->
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideUsersModal()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>

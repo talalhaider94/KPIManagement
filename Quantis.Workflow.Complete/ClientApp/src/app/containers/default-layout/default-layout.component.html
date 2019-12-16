@@ -1,0 +1,119 @@
+<app-header [fixed]="true" [navbarBrandFull]="{src: 'assets/img/brand/logo.jpg',  alt: 'KPI Management'}"
+            [navbarBrandMinimized]="" [sidebarToggler]="'lg'"
+            [asideMenuToggler]="'lg'">
+  <ul class="nav navbar-nav d-md-down-none">
+    <li class="nav-item px-3">
+     <div class="row">
+        <div class="col-md-6">
+          <a class="nav-link pointer-cursor text-gray" (click)="dashboardList()">Dashboards</a>
+        </div>
+        <div [hidden]="showPowerBI==0" class="col-md-6">
+          <a class="nav-link pointer-cursor text-gray" (click)="powerBI()">Power BI</a>
+        </div>
+     </div>
+    </li>
+  </ul>
+  <ul class="nav navbar-nav ml-auto" style="background-color: #ffffff !important">
+    <li class="nav-item" *ngIf="loading">
+      <i class="fa fa-spin fa-spinner text-info fa-2x"></i>
+    </li>
+    <li style="padding-right:10px">
+      <a href="#" routerLink="/go-back" title="refresh" style="color: #0042be;"><i class="fa fa-refresh"></i></a>
+    </li>
+
+    <!--li class="nav-item dropdown" dropdown placement="bottom right">
+      <a class="nav-link" href="#" role="button" aria-haspopup="true" aria-expanded="false" dropdownToggle
+         (click)="false">
+        <i class="icon-bell"></i>
+        <span class="badge badge-pill badge-danger">0</span>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+        <a class="dropdown-item" href="#"><i class="fa fa-warning text-danger"></i>IMSIN026 - Fuori target</a>
+        <a class="dropdown-item" href="#"><i class="fa fa-warning text-danger"></i>IMSIN028 - Escalation</a>
+        <a class="dropdown-item text-center" href="#"><strong>Vedi tutti</strong></a>
+      </div>
+    </li-->
+    <li class="nav-item dropdown" dropdown placement="bottom right">
+      <a class="nav-link" href="#" role="button" aria-haspopup="true" aria-expanded="false" dropdownToggle
+         (click)="false">
+        <i class="fa fa-user"></i> {{currentUser.username}}
+      </a>
+      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+        <div class="dropdown-header text-center"><strong>Configurazioni</strong></div>
+        <!-- <a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profilo</a>
+        <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> Impostazioni</a> -->
+        <div class="divider"></div>
+        <a class="dropdown-item pointer-cursor" (click)='logout()'><i class="fa fa-lock"></i> Logout</a>
+      </div>
+    </li>
+  </ul>
+</app-header>
+<div class="app-body">
+  <app-sidebar [fixed]="true" [display]="'lg'" [minimized]="true">
+    <!-- Danial: navItems are coming from _nav.ts  -->
+    <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="sidebarMinimized"></app-sidebar-nav>
+    <!-- <span style="padding-left: 15px; color:#bbb"> v{{currentVerion}} </span> -->
+    <app-sidebar-minimizer></app-sidebar-minimizer>
+  </app-sidebar>
+  <!-- Main content -->
+  <main class="main">
+    <!-- Breadcrumb -->
+    <!-- breaking change 'cui-breadcrumb' -->
+    <!--> cui-breadcrumb id="disableBreadcrumb">
+        <li class="breadcrumb-menu d-md-down-none">
+            <span class="text-gray"><i class="icon-graph"></i> v{{currentVerion}}</span>
+        </li>
+    </cui-breadcrumb -->
+    <div class="container-fluid">
+      <!-- Danial: center area to display content -->
+      <router-outlet></router-outlet>
+    </div><!-- /.container-fluid -->
+  </main>
+  <app-aside [fixed]="true" [display]="false">
+        <div class="p-3">
+          <h6>Home Page</h6>
+          <p>Selezionare la Dashboard da visualizzare dopo il login.</p>
+          <a class="text-dark" routerLink='/dashboard/about' *ngIf='showAboutPage'><strong>Page version</strong></a>
+          <p *ngIf="loadingDashboard" class="text-center">
+            <i class="fa fa-spin fa-spinner text-info fa-2x"></i>
+          </p>
+          <div class="aside-options" *ngFor="let dashboard of dashboardCollection">
+            <div class="clearfix mt-4">
+              <small>
+                <b>
+                  <!-- <a *ngIf="showLandingPage == true" class="pointer-cursor" (click)="saveLandingPage()">Standard Landing Page</a> -->
+                  <a class="pointer-cursor" (click)="dashboard.id==-1 ? standardDashboardNavigation() : dashboardNavigation(dashboard.id)">{{ dashboard.name }}</a>
+                </b>
+              </small>
+              <ng-container>
+                <label class="switch switch-label switch-pill switch-success switch-sm float-right">
+                  <input type="checkbox" class="switch-input" [checked]="dashboard.isdefault" #switchValue checked
+                         (change)="dashboardSwitch(switchValue, dashboard.id)">
+                  <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                </label>
+              </ng-container>
+            </div>
+          </div>
+          <!-- <div class="aside-options" *ngIf="showLandingPage == true">
+            <div class="clearfix mt-4">
+              <small>
+                <b>
+                  <a class="pointer-cursor" (click)="dashboardNavigation(dashboard.id)">Standard Landing Page</a>
+                </b>
+              </small>
+              <ng-container>
+                <label class="switch switch-label switch-pill switch-success switch-sm float-right">
+                  <input type="checkbox" class="switch-input" [checked]="dashboard.isdefault" #switchValue checked
+                    (change)="dashboardSwitch(switchValue, dashboard.id)">
+                  <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+                </label>
+              </ng-container>
+            </div>
+          </div> -->
+        </div>
+
+  </app-aside>
+</div>
+<app-footer style="position:fixed;bottom:0; width:100%;background-color: #eedc00;color:#0047bb">
+  <img src="../../../assets/img/brand/poste-italiane.png" style="height: 20px;"/>
+</app-footer>

@@ -1,0 +1,11 @@
+<div class="card cardbody row">
+  <div  class="col">
+  <h1>Page Versions</h1>
+  <br>
+  <ul>
+    <li *ngFor= "let version of pageVersions | keyvalue">
+      {{ version.key }} : {{ version.value }}
+    </li>
+  </ul>
+</div>
+</div>

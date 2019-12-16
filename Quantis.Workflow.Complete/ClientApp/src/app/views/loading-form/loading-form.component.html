@@ -1,0 +1,48 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div *ngIf="loading" class="text-center mb-1">
+                        <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                    </div>
+                    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                           class="table table-responsive-sm table-hover table-outline mb-0">
+                        <thead class="thead-light2">
+                            <tr>
+                                <th class="text-center">No.</th>
+                                <th class="text-center">Form ID</th>
+                                <th class="text-center">Nome Form</th>
+                                <th class="text-center">Azione</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="loadingForms.length === 0 && !loading">
+                                <td colspan="6"><strong>Nessun loading Form Trovata.</strong></td>
+                            </tr>
+                            <tr *ngFor="let loadingForm of loadingForms; let i = index">
+                                <td>
+                                    <div class="text-center">{{ i+1 }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-center">{{ loadingForm.form_id }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-center">{{ loadingForm.form_name }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-center">
+                                        <a [routerLink]="['/loading-form/admin', loadingForm.form_id, loadingForm.form_name]"
+                                           class="btn btn-primary btn-sm"><span class="fa fa-edit"></span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--/.col-->
+    </div>
+    <!--/.row-->
+</div>

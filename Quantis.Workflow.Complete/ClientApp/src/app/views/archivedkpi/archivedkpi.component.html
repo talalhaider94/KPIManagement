@@ -1,0 +1,481 @@
+<div style="margin-top: -20px;">
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br><h2 style="color:#565656">KPI CERTIFICATI: {{monthVar}}/{{yearVar}}</h2><br>
+        <p>
+
+            <button style="text-align: center;display: inline-block; background-color: #0042be" class="btn btn-primary info-btn" aria-hidden="true" type="button" data-toggle="collapse" data-target=".multi" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2" (click)="showCollapse()"><b>INFO</b></button>
+        </p>
+        <div class="row collapse multi" id="multiCollapseExample1" bsModal #multiCollapseExample1>
+
+            <!-- <mat-card class="example-card" style="margin-left: 20px; width: 50%">
+               <mat-card-header style="margin-left: 30px">
+               <mat-card-title style="color:#20a8d8">KPI</mat-card-title>
+               <mat-card-subtitle style="margin-left:18px">{{getNumeroKPI()}}</mat-card-subtitle>
+               </mat-card-header>
+             </mat-card>
+
+                   <mat-card class="example-card" style="margin-left: 20px; width: 50%">
+                     <mat-card-header style="margin-left: 30px">
+                     <mat-card-title style="color:#20a8d8">KPI</mat-card-title>
+                     <mat-card-subtitle style="margin-left:18px">{{getNumeroKPI()}}</mat-card-subtitle>
+                     </mat-card-header>
+                   </mat-card>
+                -->
+            <div class="row">
+                <!--<mat-card class="example-card" style="margin-left: 20px;">
+                   <mat-card-header>
+                     <mat-card-title style="color:#20a8d8">CONTRATTI</mat-card-title>
+                     <mat-card-subtitle style="margin-left: 40px" *ngFor="let et of arrayContratti | keyvalue"><b> {{et.key}}</b></mat-card-subtitle>
+                   </mat-card-header>
+                 </mat-card>&nbsp;-->
+
+                <mat-card class="example-card" style="margin-left: 20px;">
+                    <mat-card-header>
+                        <mat-card-title style="color:#0042be;text-align: center;">KPI/CONTRATTI</mat-card-title>
+
+                        <mat-card-subtitle style="text-align: center;font-size: 20px;" *ngFor="let et of res | keyvalue"><b> {{et.value.length}}/{{et.key}}</b></mat-card-subtitle>
+                    </mat-card-header>
+                </mat-card>&nbsp;
+
+                <mat-card class="example-card" style="margin-left: 20px;">
+                    <mat-card-header>
+                        <mat-card-title style="color:#0042be;text-align: center;">TOTALE KPI</mat-card-title>
+                        <mat-card-subtitle style="text-align: center; font-size: 25px;"><b>{{getNumeroKPI()}}</b></mat-card-subtitle>
+                    </mat-card-header>
+                </mat-card>&nbsp;
+                <br>
+            </div>
+        </div>
+        <br>
+
+        <h4 style="color:#565656;">Periodo:</h4>
+        <div class="row">
+
+            <select [(ngModel)]="monthVar" class="form-control ml-3" style="width:15%;" (change)="populateDateFilter()">
+                <option value="00">Tutti i mesi</option>
+                <option value="01">Gennaio</option>
+                <option value="02">Febbraio</option>
+                <option value="03">Marzo</option>
+                <option value="04">Aprile</option>
+                <option value="05">Maggio</option>
+                <option value="06">Giugno</option>
+                <option value="07">Luglio</option>
+                <option value="08">Agosto</option>
+                <option value="09">Settembre</option>
+                <option value="10">Ottobre</option>
+                <option value="11">Novembre</option>
+                <option value="12">Dicembre</option>
+            </select>
+            <select [(ngModel)]="yearVar" class="form-control ml-1" style="width:15%;" (change)="populateDateFilter()">
+                <option value="">Anno</option>
+                <option *ngFor="let year of anni">{{year}}</option>
+            </select>
+        </div>
+
+        <br>
+        <h5 *ngIf='loading' id="loader" class="text-center">
+            <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+        </h5>
+
+        <table class="table stripe" #ArchivedkpiTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+
+            <thead class="thead-light2">
+                <tr>
+                    <th style="text-align:center">Cliente</th>
+                    <th style="text-align:center">Contratto</th>
+                    <th style="text-align:center">ID KPI</th>
+                    <th style="text-align:center">Titolo</th>
+                    <th style="text-align:center">Frequenza</th>
+                    <th style="text-align:center">Valore</th>
+                    <th style="text-align:center">Periodo</th>
+                    <th style="text-align:center">Ticket ID</th>
+                    <th style="text-align:center">Chiusura Ticket</th>
+
+                    <th style="text-align:center">Azione</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of ArchivedKpiBodyData; index as i">
+                    <td style="text-align:center">{{row.customer_name}}</td>
+                    <td style="text-align:center">{{row.contract_name}}</td>
+                    <td style="text-align:center">{{row.id_kpi}}</td>
+                    <td style="text-align:center">{{row.kpi_name_bsi}}</td>
+                    <td style="text-align:center">{{row.tracking_period}}</td>
+                    <td style="text-align:center">{{row.value_kpi}} {{row.symbol}}</td>
+                    <td style="text-align:center">{{row.interval_kpi | amDateFormat: 'MM/YYYY' }}</td>
+                    <td style="text-align:center">{{row.ticket_id}}</td>
+                    <td style="text-align:center">{{row.close_timestamp_ticket | amDateFormat: 'DD/MM/YYYY HH:mm:ss' }}</td>
+
+                    <td align="center">
+                        <button class="btn btn-primary btn-esempio" data-toggle="modal" (click)="populateModalData(row)"
+                                data-target="#archivedKpiModal" title="VEDI">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                        <button style="text-align: center;display: inline-block; background-color: #0042be" class="btn btn-primary btn-esempio" title="DATI" data-toggle="modal" (click)="getdati(row.global_rule_id,row.tracking_period,row.interval_kpi,row.progressive)"
+                                data-target="#datiModal">
+                            <i class="fa fa-table"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="archivedKpiModal" bsModal #archivedKpiModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Valori per KPI</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="reset()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf='loadingModal1' id="loader" class="text-center">
+                    <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+                </div>
+                <div class="table-responsive" style="background: #ffffff; padding: 10px">
+                    <table id="classTable" class="table table-bordered">
+                        <thead class="thead-light2">
+                            <tr>
+                                <th style="text-align:center">Contratto</th>
+                                <th style="text-align:center">ID KPI</th>
+                                <th style="text-align:center">Titolo</th>
+                                <th style="text-align:center">Periodo</th>
+                                <th style="text-align:center">Valore</th>
+                                <th style="text-align:center">Ticket ID</th>
+                                <th style="text-align:center">Chiusura Ticket</th>
+
+                                <th style="text-align:center">Azione</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let rec of kpisData">
+                                <td style="text-align:center">{{rec.contract_name}}</td>
+                                <td style="text-align:center">{{rec.id_kpi}}</td>
+                                <td style="text-align:center">{{rec.name_kpi}}</td>
+                                <td style="text-align:center">{{rec.interval_kpi  | amDateFormat: 'MM/YYYY' }}</td>
+                                <td style="text-align:center">{{rec.value_kpi}} {{rec.symbol}}</td>
+                                <td style="text-align:center">{{rec.ticket_id}}</td>
+                                <td style="text-align:center">{{rec.close_timestamp_ticket | amDateFormat: 'DD/MM/YYYY HH:mm:ss' }}</td>
+
+                                <td align="center">
+                                    <button class="btn btn-primary btn-esempio" data-toggle="modal" title="DATI" (click)="getDatiSecondPop(rec.global_rule_id,rec.interval_kpi,rec.tracking_period)"
+                                            data-target="#datiTempoModal">
+                                        <i class="fa fa-table"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="reset()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="datiModal" bsModal #datiModal="bs-modal" class="modal fade modal-right" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">DATI</h5><br><br>
+
+                <button type="button" class="close" (click)="clearAndClose()" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br>
+            <!-- <div class="row" style="margin-left: 20px">
+                <p>
+
+                  <button class="btn btn-primary info-btn" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><b>INFO</b></button>
+                  </p>
+                </div>
+                  <div class="row">
+
+                      <div class="collapse" id="collapseExample">
+                        <mat-card class="example-card" style="margin-left: 20px; ">
+                          <mat-card-header>
+                        <mat-card-title style="color:#20a8d8; text-align: center;">Eventi</mat-card-title>
+                        <mat-card-subtitle style="text-align: center;" *ngFor="let et of eventTypeArray | keyvalue"><b> {{et.key}}:{{et.value}}</b></mat-card-subtitle>
+                        </mat-card-header>
+                        </mat-card>
+                    </div>
+                  </div>-->
+            <div *ngIf='loadingModalDati' id="loader" class="text-center">
+                <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+
+                    <select [(ngModel)]="meseSelezionato" class="form-control ml-3" style="width:15%;" (change)="getdati1(id_kpi_temp,meseSelezionato)">
+
+                        <option *ngFor="let name of arrayPeriodo" value="{{name}}">{{name}}/{{this.yearVar}}</option>
+                    </select>
+                </div>
+                <br><br>
+                <div class="row">
+                    <input class="form-control" style="width: 18%;margin-left:22px" type="text" name="search" [(ngModel)]="filter" placeholder="Cerca">
+                    <button (click)="fireEvent()" style="margin-left:20%">Esporta CSV</button>
+                </div>
+
+                <div class="table-responsive" style="background: #ffffff; padding: 10px">
+                    <!-- <button class="btn fa fa-plus" style="color:white; padding: 2px 7px; margin-left: 98%; background-color: #20a8d8;display: inline-block;text-align: center; margin-bottom: 0px" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="Collapse1 Collapse2"></button>-->
+                    <table id="classTable" class="table table-bordered" #table>
+                        <thead class="thead-light2">
+                            <tr>
+
+                                <th style="text-align:center">create date</th>
+                                <th style="text-align:center">modify date</th>
+                                <th style="text-align:center">raw data id</th>
+                                <th style="text-align:center">event type id</th>
+                                <th style="text-align:center">resource id</th>
+                                <th style="text-align:center">time stamp</th>
+                                <th style="text-align:center">reader id</th>
+                                <th style="text-align:center">event state id</th>
+                                <th style="text-align:center">partner raw_data id</th>
+                                <th *ngFor="let key of countCampiData">campo {{key}}</th>
+
+                                <!--   <th style="text-align:center"[class.active]="order === 'create_date'"
+                                (click)="setOrder('create_date')" >create date<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+
+                                <th style="text-align:center"[class.active]="order === 'modify_date'"
+                                (click)="setOrder('modify_date')">modify date<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                  <th style="text-align:center"[class.active]="order === 'raw_data_id'"
+                                  (click)="setOrder('raw_data_id')">raw data id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                <th style="text-align:center"[class.active]="order === 'event_type_id'"
+                                (click)="setOrder('event_type_id')">event Type id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                <th style="text-align:center"[class.active]="order === 'resource_id'"
+                                (click)="setOrder('resource_id')">resource id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                <th style="text-align:center"[class.active]="order === 'time_stamp'"
+                                (click)="setOrder('time_stamp')">time stamp<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i>
+                                  </span></th>
+
+                                  <th style="text-align:center"[class.active]="order === 'reader_id'"
+                                  (click)="setOrder('reader_id')">reader id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                    ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>-->
+                                <!-- <th style="text-align:center"[class.active]="order === 'event_source_type_id'"
+                                (click)="setOrder('event_source_type_id')">event source type id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span> </th>-->
+                                <!-- <th style="text-align:center"[class.active]="order === 'event_state_id'"
+                                 (click)="setOrder('event_state_id')">event state id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                   ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+
+                                 <th style="text-align:center" data-visible="false" [class.active]="order === 'partner_raw_data_id'"
+                                 (click)="setOrder('partner_raw_data_id')">partner raw data id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                   ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+
+                                 <th *ngFor="let key of countCampiData" style="text-align:center" [class.active]="order === 'key.info.data[key]'"
+                                 (click)="setOrder('key.info.data[key]')" class="mdl-data-table__cell--non-numeric">campo {{key}}<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                   ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>-->
+                                <!--<th colspan="3" style="text-align:center"class="hiddenRow" > <div class="collapse multi-collapse" id="Collapse1">reader id</div></th>
+                                <th colspan="3" style="text-align:center"class="hiddenRow" > <div class="collapse multi-collapse" id="Collapse1">partner raw data id</div></th>
+                                <th colspan="3"  style="text-align:center" class="hiddenRow" >  <div class="collapse multi-collapse" id="Collapse1">event source type id</div></th>
+                                <th colspan="3" style="text-align:center" class="hiddenRow" > <div class="collapse multi-collapse" id="Collapse1">event state id </div></th>-->
+                                <!-- <th style="text-align:center"class="hiddenRow" ><div class="accordian-body collapse"  style="text-align:center" id="demo1">partner raw data id</div></th>
+                                <th style="text-align:center" class="hiddenRow" ><div class="accordian-body collapse"  style="text-align:center" id="demo1">event source type id</div></th>
+                                <th style="text-align:center" class="hiddenRow" ><div class="accordian-body collapse"  style="text-align:center" id="demo1">event state id</div></th>-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="fitroDataById.length==0">
+                                <td class="font-italic text-center" colspan="12">
+                                    Nessun dato per il periodo selezionato
+                                </td>
+                            </tr>
+                            <!--   <tr *ngIf="loading" class="text-center">
+                                 <td colspan="6"></td>
+                                     <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                                 </td>
+                             </tr>-->
+                            <tr *ngFor="let rec of fitroDataById  | filter: filter  | paginate: { itemsPerPage: 100, currentPage: p }" data-toggle="collapse" data-target="#accordion" class="clickable">
+                                <td style="text-align:center">{{rec.create_date}}</td>
+                                <td style="text-align:center">{{rec.modify_date}}</td>
+                                <td style="text-align:center">{{rec.raw_data_id}}</td>
+                                <td style="text-align:center">{{rec.event_type_id}}</td>
+                                <td style="text-align:center">{{rec.resource_id}}</td>
+                                <td style="text-align:center">{{rec.time_stamp }}</td>
+                                <td style="text-align:center">{{rec.reader_id}}</td>
+                                <!-- <td style="text-align:center">{{rec.event_source_type_id}}</td>-->
+                                <td style="text-align:center">{{rec.event_state_id}}</td>
+                                <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                                <td style="text-align:center" *ngFor="let key of rec.data | keys"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key]}}</span></td>
+
+                                <!--td *ngFor='let item of [].constructor(countCampiData-rec.data.length); let i = index'>{{i}}</td-->
+                                <!--  <td colspan="3" style="text-align:center" class="hiddenRow"> <div class="collapse multi-collapse" id="Collapse2"> <br>{{rec.reader_id}} </div> </td>
+                                <td colspan="3" style="text-align:center" class="hiddenRow"> <div class="collapse multi-collapse" id="Collapse2"> <br>{{rec.partner_raw_data_id}} </div> </td>
+                                <td colspan="3" style="text-align:center" class="hiddenRow"> <div class="collapse multi-collapse" id="Collapse2"> <br>{{rec.event_source_type_id}} </div> </td>
+                                <td colspan="3" style="text-align:center" class="hiddenRow"> <div class="collapse multi-collapse" id="Collapse2"> <br>{{rec.event_state_id}} </div> </td>-->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <pagination-controls previousLabel="precedente" nextLabel="successiva" (pageChange)="p = $event"></pagination-controls>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="clearAndClose()" data-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="datiTempoModal" bsModal #datiTempoModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">DATI</h5><br><br>
+
+                <button type="button" class="close" (click)="clear1AndClose()" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <br>
+            <!-- <div class="row" style="margin-left: 20px">
+               <p>
+
+                 <button class="btn btn-primary info-btn" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><b>INFO</b></button>
+                 </p>
+               </div>-->
+            <!--  <div class="row">
+
+                  <div class="collapse" id="collapseExample">
+                    <mat-card class="example-card" style="margin-left: 20px;">
+                      <mat-card-header>
+                    <mat-card-title style="color:#20a8d8;text-align: center;">EVENTI</mat-card-title>
+                    <mat-card-subtitle style="text-align: center;" *ngFor="let et of eventTypeArray | keyvalue"><b> {{et.key}}:{{et.value}}</b></mat-card-subtitle>
+                    </mat-card-header>
+                    </mat-card>
+                </div>
+              </div>-->
+            <h5 *ngIf='loadingModalDati' id="loader" class="text-center">
+                <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+            </h5>
+
+            <div class="modal-body">
+                <div class="row">
+
+                    <select [(ngModel)]="meseSelezionato" class="form-control ml-3" style="width:15%;" (change)="getDatiSecondPop2(id_kpi_temp,meseSelezionato,annoSelezionato)">
+
+                        <option *ngFor="let me of arrayPeriodo" value="{{me}}">{{me}}/{{this.annoSelezionato}}</option>
+                    </select>
+                </div>
+                <br><br>
+                <div class="row">
+                    <input class="form-control" style="width: 18%;margin-left:22px" type="text" name="search" [(ngModel)]="filter" placeholder="Cerca">
+                    <button (click)="fireEvent()" style="margin-left:20%">Esporta CSV</button>
+                </div>
+
+                <div class="table-responsive gatto" style="background: #ffffff; padding: 10px">
+                    <!-- <button class="btn fa fa-plus" style="color:white; padding: 2px 7px; margin-left: 98%; background-color: #20a8d8;display: inline-block;text-align: center; margin-bottom: 0px" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="Collapse1 Collapse2"></button>-->
+                    <table id="classTable" class="table table-bordered" #table>
+                        <thead class="thead-light2">
+                            <tr>
+                                <th style="text-align:center">create date</th>
+                                <th style="text-align:center">modify date</th>
+                                <th style="text-align:center">raw data id</th>
+                                <th style="text-align:center">event type id</th>
+                                <th style="text-align:center">resource id</th>
+                                <th style="text-align:center">time stamp</th>
+                                <th style="text-align:center">reader id</th>
+                                <th style="text-align:center">event state id</th>
+                                <th style="text-align:center">partner raw_data id</th>
+                                <th *ngFor="let key of countCampiData">campo {{key}}</th>
+
+                                <!--  <th style="text-align:center"[class.active]="order === 'create_date'"
+                                (click)="setOrder('create_date')">create date<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                   <th style="text-align:center"[class.active]="order === 'modify_date'"
+                                (click)="setOrder('modify_date')">modify date<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                  <th style="text-align:center"[class.active]="order === 'raw_data_id'"
+                                  (click)="setOrder('raw_data_id')">raw data id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                <th style="text-align:center"[class.active]="order === 'event_type_id'"
+                                (click)="setOrder('event_type_id')">event Type id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                <th style="text-align:center"[class.active]="order === 'resource_id'"
+                                (click)="setOrder('resource_id')">resource id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+                                <th style="text-align:center"[class.active]="order === 'time_stamp'"
+                                (click)="setOrder('time_stamp')">time stamp<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i>
+                                  </span></th>
+
+                                  <th style="text-align:center"[class.active]="order === 'reader_id'"
+                                  (click)="setOrder('reader_id')">reader id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                    ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>-->
+                                <!-- <th style="text-align:center"[class.active]="order === 'event_source_type_id'"
+                                (click)="setOrder('event_source_type_id')">event source type id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                  ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span> </th>-->
+                                <!-- <th style="text-align:center"[class.active]="order === 'event_state_id'"
+                                 (click)="setOrder('event_state_id')">event state id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                   ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+
+                                 <th style="text-align:center" data-visible="false" [class.active]="order === 'partner_raw_data_id'"
+                                 (click)="setOrder('partner_raw_data_id')">partner raw data id<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                   ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>
+
+                                 <th *ngFor="let key of countCampiData" style="text-align:center" [class.active]="order === 'key.info.data[key]'"
+                                 (click)="setOrder('key.info.data[key]')">campo {{key}}<span [hidden]="reverse"> <i class="fa fa-arrow-down"></i></span
+                                   ><span [hidden]="!reverse"> <i class="fa fa-arrow-up"></i></span></th>-->
+                                <!--<th colspan="3" style="text-align:center"class="hiddenRow" > <div class="collapse multi-collapse" id="Collapse1">reader id</div></th>
+                                <th colspan="3" style="text-align:center"class="hiddenRow" > <div class="collapse multi-collapse" id="Collapse1">partner raw data id</div></th>
+                                <th colspan="3"  style="text-align:center" class="hiddenRow" >  <div class="collapse multi-collapse" id="Collapse1">event source type id</div></th>
+                                <th colspan="3" style="text-align:center" class="hiddenRow" > <div class="collapse multi-collapse" id="Collapse1">event state id </div></th>-->
+                                <!-- <th style="text-align:center"class="hiddenRow" ><div class="accordian-body collapse"  style="text-align:center" id="demo1">partner raw data id</div></th>
+                                <th style="text-align:center" class="hiddenRow" ><div class="accordian-body collapse"  style="text-align:center" id="demo1">event source type id</div></th>
+                                <th style="text-align:center" class="hiddenRow" ><div class="accordian-body collapse"  style="text-align:center" id="demo1">event state id</div></th>-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="fitroDataById.length==0">
+                                <td class="font-italic text-center" colspan="12">
+                                    Nessun dato per il periodo selezionato
+                                </td>
+                            </tr>
+                            <!--   <tr *ngIf="loading" class="text-center">
+                                 <td colspan="6"></td>
+                                     <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                                 </td>
+                             </tr>-->
+                            <tr *ngFor="let rec of fitroDataById | filter: filter  | paginate: { itemsPerPage: 100, currentPage: p }" data-toggle="collapse" data-target="#accordion" class="clickable">
+                                <td style="text-align:center">{{rec.create_date }}</td>
+                                <td style="text-align:center">{{rec.modify_date }}</td>
+                                <td style="text-align:center">{{rec.raw_data_id}}</td>
+                                <td style="text-align:center">{{rec.event_type_id}}</td>
+                                <td style="text-align:center">{{rec.resource_id}}</td>
+                                <td style="text-align:center">{{rec.time_stamp }}</td>
+                                <td style="text-align:center">{{rec.reader_id}}</td>
+                                <!-- <td style="text-align:center">{{rec.event_source_type_id}}</td>-->
+                                <td style="text-align:center">{{rec.event_state_id}}</td>
+                                <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                                <td style="text-align:center" *ngFor="let key of rec.data | keys "><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+
+                                <!--  <td colspan="3" style="text-align:center" class="hiddenRow"> <div class="collapse multi-collapse" id="Collapse2"> <br>{{rec.reader_id}} </div> </td>
+                                <td colspan="3" style="text-align:center" class="hiddenRow"> <div class="collapse multi-collapse" id="Collapse2"> <br>{{rec.partner_raw_data_id}} </div> </td>
+                                <td colspan="3" style="text-align:center" class="hiddenRow"> <div class="collapse multi-collapse" id="Collapse2"> <br>{{rec.event_source_type_id}} </div> </td>
+                                <td colspan="3" style="text-align:center" class="hiddenRow"> <div class="collapse multi-collapse" id="Collapse2"> <br>{{rec.event_state_id}} </div> </td>-->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <pagination-controls previousLabel="precedente" nextLabel="successiva" (pageChange)="p = $event"></pagination-controls>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="clear1AndClose()" data-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>

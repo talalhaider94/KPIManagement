@@ -1,0 +1,24 @@
+<div style="margin-top: -25px; padding: 10px">
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br>
+        <h2 style="color:#565656">Assegnazione Permessi: {{this.roleName}}</h2><br>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <button routerLink="/adminroles" class="btn btn-danger" style="color:#fff;"><i class="fa fa-arrow-left"></i> Torna ai Ruoli</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <dual-list [source]="gatheredData.permissionsList" key="id" display="name" [(destination)]="gatheredData.assignedPermissions"
+                           filter="true" (destinationChange)="onPermissionSelectDeselect($event)" [format]="format" height="400px">
+                </dual-list>
+                <div>
+                    <br>
+                    <button (click)="saveAssignedPermissions()" class="btn btn-success pull-right" [disabled]="!gatheredData.roleId">Salva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

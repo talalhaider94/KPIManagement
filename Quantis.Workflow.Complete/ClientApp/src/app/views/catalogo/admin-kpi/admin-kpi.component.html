@@ -1,0 +1,170 @@
+<div style="margin-top: -25px; padding: 10px">
+    <br />
+    <div class="table-responsive" style="background: #ffffff; padding: 5px">
+        <br><h2 style="color:#565656">KPI DA CONSOLIDARE</h2><br>
+        <div class="row">
+            <button class="ml-3" #btnExporta>Esporta CSV</button>
+        </div><br />
+        <h5 *ngIf="loading" class="text-center text-primary" style="color:#eedc00 !important">
+            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+        </h5>
+        <table class="table stripe kpiTable" #kpiTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+            <thead class="thead-light2">
+                <tr style="color:white;font-size:12px;">
+                    <th style="text-align:center">GLOBAL RULE ID</th>
+                    <th style="text-align:center">CONTRATTO</th>
+                    <th style="text-align:center">KPI</th>
+                    <th style="text-align:center">DESCRIZIONE</th>
+                    <th style="text-align:center">CONTRAENTE PRIMARIO</th>
+                    <th style="text-align:center">CONTRAENTE SECONDARIO</th>
+                    <th style="text-align:center">ULTIMA MODIFICA</th>
+                    <th class="notExportCsv" style="text-align:center">AZIONE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of kpiTableBodyData; index as i" style="font-size:13px">
+                    <td style="text-align: left;">{{row.global_rule_id}}</td>
+                    <td style="text-align: left;">{{row.sla_name}}</td>
+                    <td style="text-align: left;">{{row.rule_name}}</td>
+                    <td class="tagsTip" *ngIf="row.rule_description; then trueBlock else falseBlock"></td>
+                    <ng-template #trueBlock><td class="tagsTip" style="text-align: left;" width="50%" data-ext="" attr.data-ext="{{row.rule_description}}">{{row.rule_description}}</td></ng-template>
+                    <ng-template #falseBlock><td align="center"> </td></ng-template>
+                    <td style="text-align: left;">{{row.primary_contract_party_name}}</td>
+                    <td style="text-align: left;">{{row.secondary_contract_party_name}}</td>
+                    <td style="text-align: left;">{{row.modify_date}}</td>
+                    <td class="notExportCsv" align="center">
+                        <button style="font-size:10px" class="btn btn-primary" data-toggle="modal" (click)="populateModalData(row)" data-target="#kpiModal">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="kpiModal" bsModal #configModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Modifica KPI</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideConfigModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive" style="background: #ffffff; padding: 10px">
+                    <table id="classTable" class="table stripe">
+                        <thead class="thead-light2">
+                        </thead>
+                        <tbody>
+                          <tr><th>CONTRATTO</th><td colspan="2">{{modalData.contract}}</td></tr>
+                          <tr><th>NOME KPI BSI</th><td colspan="2">{{modalData.kpi_name_bsi}}</td></tr>
+                          <tr><th>DESCRIZIONE</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.kpi_description"></td></tr>
+                          <tr><th>CALCOLO</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.kpi_computing_description"></td></tr>
+                          <tr><th>ESCALATION</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.escalation"></td></tr>
+                          <tr><th>ID KPI</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.id_kpi"></td></tr>
+                          <tr><th>TITOLO BREVE</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.short_name"></td></tr>
+                          <tr>
+                            <th>UNITA ORGANIZZATIVA</th>
+                            <td colspan="2">
+                              <select class="form-control" [(ngModel)]="modalData.organization_unit">
+                                <option value=""><- Nessuna Unità Organizativa -></option>
+                                <option *ngFor="let item of allOrganizationUnits " value="{{item.id}}">{{item.organization_unit}}</option>
+                              </select>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>CARICAMENTO</th>
+                            <td colspan="2">
+                              <select class="form-control" [(ngModel)]="modalData.source_type" name="source_type">
+                                <option value=""><- Nessun Caricamento -></option>
+                                <option value="AUTOMATICO">AUTOMATICO</option>
+                                <option value="MANUALE LF">MANUALE LOADING FORM</option>
+                                <option value="MANUALE CSV">MANUALE CSV</option>
+                              </select>
+                            </td>
+                          </tr>
+                          <tr *ngIf="modalData.source_type == 'MANUALE LF'">
+                            <th>LOADING FORM</th>
+                            <td colspan="2">
+                              <select class="form-control" [(ngModel)]="modalData.id_form">
+                                <option value=""><- Nessun Loading Form -></option>
+                                <option *ngFor="let item of allForms " value="{{item.form_id}}">{{item.form_name}}</option>
+                              </select>
+                            </td>
+                          </tr>
+                          <tr *ngIf="modalData.source_type == 'MANUALE CSV'">
+                            <th>CSV FILE NAME</th>
+                            <td colspan="2">
+                              <input type="text" class="form-control" [(ngModel)]="modalData.file_name">
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>FREQUENZA</th>
+                            <td colspan="2">
+                              <select class="form-control" [(ngModel)]="modalData.tracking_period" name="tracking_period">
+                                <option value=""><- Nessuna Frequenza -></option>
+                                <option value="MENSILE">MENSILE</option>
+                                <option value="TRIMESTRALE">TRIMESTRALE</option>
+                                <option value="QUADRIMESTRALE">QUADRIMESTRALE</option>
+                                <option value="SEMESTRALE">SEMESTRALE</option>
+                                <option value="ANNUALE">ANNUALE</option>
+                              </select>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>TIPOLOGIA</th>
+                            <td colspan="2">
+                              <select class="form-control" [(ngModel)]="modalData.kpi_type" name="kpi_type">
+                                <option value=""><- Nessuna Tipologia -></option>
+                                <option value="P">PENALE</option>
+                                <option value="M">MONITORAGGIO</option>
+                                <option value="O">OBIETTIVO</option>
+                              </select>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>CATEGORIA</th>
+                            <td colspan="2">
+                              <select class="form-control" [(ngModel)]="modalData.kpi_category" name="kpi_category">
+                                <option value="C">Contrattuale</option>
+                                <option value="O">Operativo</option>
+                                <option value="F">Finanziario</option>
+                              </select>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>FORNITURA</th>
+                            <td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.source_name"></td>
+                          </tr>
+                          <tr><th>REFERENTI INPUT</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.referent"></td></tr>
+                          <tr><th>REFERENTI 1</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.referent_1"></td></tr>
+                          <tr><th>REFERENTI 2</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.referent_2"></td></tr>
+                          <tr><th>REFERENTI 3</th><td colspan="2"><input type="text" class="form-control" [(ngModel)]="modalData.referent_3"></td></tr>
+                          <tr><th>PROGRESSIVO</th><td colspan="2" style="text-align:center"><input type="checkbox" [(ngModel)]="modalData.progressive" /></td></tr>
+                        </tbody>
+                    </table>
+                    <table id="classTable" class="table stripe">
+                        <thead class="thead-light2">
+                        </thead>
+                        <tbody>
+                            <tr style="text-align:center"><th>ABILITATO</th><th>REMINDER</th><th>WORKFLOW</th></tr>
+                            <tr>
+                                <td align="center"><input type="checkbox" [(ngModel)]="modalData.enable" /></td>
+                                <td align="center"><input [disabled]="modalData.enable == false" type="checkbox" [(ngModel)]="modalData.enable_rm" /></td>
+                                <td align="center"><input [disabled]="modalData.enable == false" type="checkbox" [(ngModel)]="modalData.enable_wf" /></td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button (click)="updateKpi('kpi')" class="btn btn-success">Consolida</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideConfigModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>

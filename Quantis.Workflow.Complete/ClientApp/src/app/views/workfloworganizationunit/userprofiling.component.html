@@ -1,0 +1,107 @@
+<div class="parent-div">
+    <div class="table-responsive remove-grey-area" style="background: #ffffff; padding: 10px">
+        <br>
+        <h2 style="color:#565656">Workflow - Organization Unit</h2>
+        <div class="row role-permissions-lists col-md-12">
+            <div class="col-md-4">
+                <div>
+                    <label class="lbl-filter-user">
+                        Contraente: <strong class="selected-user-title">{{selectedData.name|uppercase}}</strong>
+                    </label>
+                </div>
+                <div class="txt-filter-user-div">
+                    <input type="text" class="form-control" placeholder="Cerca"
+                           [(ngModel)]="filters.searchUsersText" />
+                </div>
+                <perfect-scrollbar style="max-height: 500px;">
+
+                    <ul class="users-list">
+                        <h5 *ngIf="loading.roles" class="text-center text-primary loader" style="color:#eedc00 !important">
+                            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento..
+                        </h5>
+                        <li *ngFor="let user of gatheredData.usersList | filter : filters.searchUsersText; index as i"
+                            (click)="selectRoleItem(user, $event)">{{user.name}}</li>
+                    </ul>
+                </perfect-scrollbar>
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-7">
+                <div>
+                    <label class="lbl-filter-user">
+                        Contratti: <strong class="selected-user-title"></strong>
+                    </label>
+                </div>
+                <div class="txt-filter-user-div">
+                    <input type="text" class="form-control" placeholder="Cerca"
+                           [(ngModel)]="filters.searchPermissionsText" />
+                </div>
+                <perfect-scrollbar style="max-height: 500px;">
+
+                    <ul class="users-list permissions-list1">
+                        <h5 *ngIf="loading.roles" class="text-center text-primary loader" style="color:#eedc00 !important">
+                            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento..
+                        </h5>
+                        <li [ngClass]="{'0':'redClr', '1':'orangeClr', '2':'greenClr'}[perm.code]" *ngFor="let perm of permissionsData | filter : filters.searchPermissionsText; index as i">
+                            {{perm.contractname}}
+                            <button class="btn btn-success pull-right ml-1 btn-partial" style="margin-top:-7px" (click)="getContracts(perm)" data-toggle="modal" data-target="#contractsModal"><i class="fa fa-arrow-right"></i></button>
+                            <!--button *ngIf="perm.code=='2' || perm.code=='1'" class="btn btn-danger pull-right ml-1 btn-assign" style="margin-top:-7px" (click)="unAssignedPermissions(perm)"><i class="fa fa-times"></i></button>
+                            <button *ngIf="perm.code=='0' || perm.code=='1'" class="btn btn-success pull-right btn-unassign" style="margin-top:-7px" (click)="assignedPermissions(perm)"><i class="fa fa-check"></i></button-->
+                        </li>
+                    </ul>
+                </perfect-scrollbar>
+            </div>
+        </div><br>
+    </div>
+</div>
+
+<div id="contractsModal" bsModal #contractsModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-md contractsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">WorkFlow - {{selectedData.contractName}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideContractsModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive" style="background: #ffffff;">
+                  <div class="role-permissions-lists col-md-12" style="padding:0px;">
+                    <table class="table stripe text-center">
+                      <thead class="thead-light2">
+                        <tr><th>Contratto</th><th>Workflow Day</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr >
+                          <td width="50%">{{selectedData.contractName}}</td>
+                          <td width="50%"><input type="number" min="0" max="28" maxlength="2" class="form-control" [(ngModel)]="saveWFContract[selectedData.contractID]" (input)="checkLimit($event.target.value,'contract',selectedData.contractID)"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <table class="table stripe text-center" *ngIf="organizationUnitsPresence">
+                      <thead class="thead-light2">
+                        <tr><th>Unità Organizzativa</th><th>Workflow Day</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let organization of contractsData; index as i">
+                          <td width="50%">{{organization.organization_unit}}</td>
+                          <td width="50%"><input type="number" min="0" max="28" maxlength="2" class="form-control" [(ngModel)]="saveOrganization[organization.id]" (input)="checkLimit($event.target.value,'organization',organization.organization_unit)"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <h5 *ngIf="organizationLoading" class="text-center text-primary loader" style="color:#eedc00 !important">
+                      <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento..
+                    </h5>
+                  </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="saveOrganizationsWorkflow()">Salva</button>
+              <button type="button" class="btn" data-dismiss="modal" (click)="hideContractsModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

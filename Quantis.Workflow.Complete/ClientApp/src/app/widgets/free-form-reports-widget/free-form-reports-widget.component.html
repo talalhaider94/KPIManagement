@@ -1,0 +1,35 @@
+<p class="float-left no-drag">
+    <input type="text" *ngIf="isDashboardModeEdit" [(ngModel)]="widgetname"
+        (ngModelChange)="widgetnameChange($event)" />
+    <span *ngIf="!isDashboardModeEdit"> {{ widgetname }}</span>
+</p>
+<button type="button" [disabled]="loading" *ngIf="!isDashboardModeEdit"
+    class="no-drag btn-sm btn btn-primary float-right mr-1" (click)="openModal()">
+    <i class="fa fa-cog"></i>
+</button>
+<div class="clearfix"></div>
+<div class="spinner-grow text-primary text-center" *ngIf="loading" role="status">
+    <span class="sr-only">Loading...</span>
+</div>
+<div class="table-responsive text-center">
+    <h6>{{reportName}}</h6>
+    <h5 *ngIf="tableHeader.length === 0"> No Report data.</h5>
+    <!-- <table class="font-12 freeFormReportTable table table-bordered table-striped" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"> -->
+    <div [hidden]="tableHeader.length === 0" class="txt-filter-user-div col-md-2 float-right mb-2">
+        <input type="text" class="form-control" placeholder="Cerca" [(ngModel)]="filterText.searchUsersText" />
+    </div><br>
+    <perfect-scrollbar style="max-height: 400px;">
+    <table class="font-12 freeFormReportTable table table-bordered table-striped">
+        <thead class="bg-info text-capitalize">
+            <tr>
+                <th *ngFor="let value of tableHeader">{{ value }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let form of freeFormReportData | filter : filterText.searchUsersText; let i = index;">
+                <td *ngFor="let key of tableHeader" [innerHTML]="form[key]"></td>
+            </tr>
+        </tbody>
+    </table>
+    </perfect-scrollbar>
+</div>

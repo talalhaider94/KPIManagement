@@ -1,0 +1,571 @@
+<div class="content-wrapper">
+    <section class="content-header">
+
+        <h4>
+            <small>{{contractpartyname}}</small>
+            <!-- <small class="" style="margin-top: 9px;font-size: 19px; font-weight:500"><b>{{month}} {{yearVar}}</b></small> -->
+        </h4>
+        <!-- <br> -->
+        <!-- <h4 style="color:#565656;">Periodo:</h4> -->
+        <div class="row pull-right col-md-6" style="margin-top:-30px">
+            <!-- <h2>
+                <small class="" style="margin-top: 9px;font-size: 19px; font-weight:500"><b>{{month}} {{yearVar}}</b></small>
+            </h2> -->
+            <select [(ngModel)]="monthVar" name="monthVar" class="form-control ml-3" style="width:20%;" (change)="populateDateFilter()">
+              <option value="00">Tutti i mesi</option>
+              <option value="01">Gennaio</option>
+              <option value="02">Febbraio</option>
+              <option value="03">Marzo</option>
+              <option value="04">Aprile</option>
+              <option value="05">Maggio</option>
+              <option value="06">Giugno</option>
+              <option value="07">Luglio</option>
+              <option value="08">Agosto</option>
+              <option value="09">Settembre</option>
+              <option value="10">Ottobre</option>
+              <option value="11">Novembre</option>
+              <option value="12">Dicembre</option>
+            </select>
+            <select [(ngModel)]="yearVar" class="form-control ml-1" style="width:17%;" (change)="populateDateFilter()">
+              <option value="">Anno</option>
+              <option *ngFor="let year of anni" >{{year}}</option>
+            </select>
+            <!-- <select [(ngModel)]="contractName" (change)='filter()' class="form-control ml-1" class="form-control ml-1" style="width:28%;">
+                <option>ALL</option>
+                <option *ngFor = "let row of contName">{{row.contractname}}</option>
+            </select> -->
+            <button type="button" class="btn btn-primary ml-1" name="button" (click)="multiSelect()">Contratti</button>
+            <select multiple [hidden]="!showMultiSelect" [(ngModel)]="contractName" (change)='customFilter()' class="form-control ml-1" size='{{gridLength-5}}' style="width:30%;position:absolute;right: 49%;top: 37px;z-index: 9;">
+                <option>ALL</option>
+                <option *ngFor = "let row of contName">{{row.contractname}}</option>
+            </select>
+            <div style='height:80%'><button class="btn btn-primary ml-1" (click)="showThresholdModal()"><i class="icon-settings"></i></button></div>
+            <button type="button" class="btn btn-success float-right ml-1" (click)="viewAll()">Tutti</button>
+            <button type="button" class="btn btn-danger float-right ml-2" (click)="gotTOlandingPage()">Indietro</button>
+        </div>
+    </section>
+    <br>
+    <h5 *ngIf="loading" class="text-center text-primary" style="color:#eedc00 !important">
+        <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+    </h5>
+    <!-- Main content -->
+    <section *ngIf="setViewAll==0" [hidden]="setThresholdValue==1" class="content">
+        <!-- Main row -->
+        <div class="row">
+            <!-- Left col class= "box box-danger box-solid"
+            [ngClass]="(row.noncomplaintkpis >= thresholdvalue)?'box box-danger box-solid':'box box-success box-solid'" -->
+            <section *ngFor="let row of limitedData; index as i" class="col-lg-3 connectedSortable ml-5">
+                <br>
+                <div [ngClass]="(row.noncomplaintkpis == 0)?'box box-success box-solid':'box box-danger box-solid'">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{row.contractname}}</h3>
+                        <!-- /.box-tools -->
+                    </div>
+                    <div class="box-body">
+                        <div class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">KPI</h3>
+                                <!-- /.box-tools -->
+                            </div>
+                            <!-- /.box-header -->
+
+                            <div class="box-footer no-padding">
+                                <ul class="nav nav-stacked">
+                                    <li>
+                                        <a>Numero KPI <span class="pull-right bold">{{row.totalkpis}}</span></a>
+                                    </li>
+                                    <li class="top-border">
+                                        <!-- <a href="#"> -->
+                                            Severity Contratti
+                                            <div class="progress" style="height: 20px">
+                                                <div *ngIf="row.complaintkpis!=0" [ngClass]="{'progress-bar active progress-bar-success':row.complaintkpis!=0}" role="progressbar" [ngStyle]="{ 'width': ((row.complaintkpis)/(row.complaintkpis+row.noncomplaintkpis)*100) + '%' }" style="height:100%">{{row.complaintkpis}}</div>
+                                                <div *ngIf="row.noncomplaintkpis!=0" [ngClass]="{'progress-bar active progress-bar-danger':row.noncomplaintkpis!=0}" role="progressbar" [ngStyle]="{ 'width': ((row.noncomplaintkpis)/(row.complaintkpis+row.noncomplaintkpis)*100) + '%' }" style="height:100%">{{row.noncomplaintkpis}}</div>
+                                            </div>
+                                        <!-- </a> -->
+                                    </li>
+                                    <li><a>KPI non Compliant <button [disabled]="row.noncomplaintkpis==0" class="btn btn-danger pull-right badge bg-red" (click)="showNonCompliantModal(row.contractname)">{{row.noncomplaintkpis}}</button></a></li>
+                                    <li><a>KPI Compliant <button [disabled]="row.complaintkpis==0" class="btn btn-success pull-right badge bg-green" (click)="showCompliantModal(row.contractname)">{{row.complaintkpis}}</button></a></li>
+                                 </ul>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- -->
+                        <div [hidden]="row.complaintkpis == 0" class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">Better Performing Contracts</h3>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding table-responsive" style="height:350px">
+                                <table class="table table-striped">
+                                    <tr>
+                                      <th style="width: 10px; padding-left:10px">#</th>
+                                      <th style="padding-left:10px">KPI</th>
+                                      <!-- <th style="padding-left:10px">Result</th> -->
+                                      <th style="width: 40px; padding-left:50px">Valore</th>
+                                      <th style="width: 40px">Target</th>
+                                    </tr>
+                                    <tr *ngFor="let b of row.bestkpis; index as j">
+                                        <td>{{j+1}}.</td>
+                                        <td>{{b.kpiname}}</td>
+                                        <!-- <td><mat-progress-bar mode="determinate" [value]="b.value" style="width:200%; margin-top:10px"></mat-progress-bar></td> -->
+                                        <td class="center-td" style="padding-left:40px"><span class="badge bg-green">{{ b.value.toFixed(3) }}%</span></td>
+                                        <td class="center-td"><span class="badge bg-blue">{{b.target.toFixed(3)}}%</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- -->
+                        <div [hidden]="row.noncomplaintkpis == 0" class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">Under Performing Contracts</h3>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding table-responsive" style="height:350px">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th style="width: 10px; padding-left:10px">#</th>
+                                        <th style="padding-left:10px">KPI</th>
+                                        <!-- <th style="padding-left:10px">Result</th> -->
+                                        <th style="width: 40px; padding-left:50px">Valore</th>
+                                        <th style="width: 40px">Target</th>
+                                    </tr>
+                                    <tr *ngFor="let b of row.worstkpis; index as j">
+                                        <td>{{j+1}}.</td>
+                                        <td>{{b.kpiname}}</td>
+                                        <!-- <td><mat-progress-bar mode="determinate" [value]="b.value" style="width:200%; margin-top:10px"></mat-progress-bar></td> -->
+                                        <td class="center-td" style="padding-left:40px"><span class="badge bg-red">{{ b.value.toFixed(3) }}%</span></td>
+                                        <td class="center-td"><span class="badge bg-blue">{{b.target.toFixed(3)}}%</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+
+    <section *ngIf="setViewAll==1" [hidden]="setThresholdValue==1" class="content">
+        <!-- Main row -->
+        <div class="row">
+            <!-- Left col class= "box box-danger box-solid"
+            [ngClass]="(row.noncomplaintkpis >= thresholdvalue)?'box box-danger box-solid':'box box-success box-solid'" -->
+            <section *ngFor="let row of orignalArray; index as i" class="col-lg-3 connectedSortable ml-5">
+                <br>
+                <div [ngClass]="(row.noncomplaintkpis == 0)?'box box-success box-solid':'box box-danger box-solid'">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{row.contractname}}</h3>
+                        <!-- /.box-tools -->
+                    </div>
+                    <div class="box-body">
+                        <div class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">KPI</h3>
+                                <!-- /.box-tools -->
+                            </div>
+                            <!-- /.box-header -->
+
+                            <div class="box-footer no-padding">
+                                <ul class="nav nav-stacked">
+                                    <li>
+                                        <a>Numero KPI <span class="pull-right bold">{{row.totalkpis}}</span></a>
+                                    </li>
+                                    <li class="top-border">
+                                        <!-- <a href="#"> -->
+                                            Severity Contratti
+                                            <div class="progress" style="height: 20px">
+                                                <div *ngIf="row.complaintkpis!=0" class="progress-bar active progress-bar-success" role="progressbar" [ngStyle]="{ 'width': ((row.complaintkpis)/(row.complaintkpis+row.noncomplaintkpis)*100) + '%' }" style="height:100%">{{row.complaintkpis}}</div>
+                                                <div *ngIf="row.noncomplaintkpis!=0" class="progress-bar active progress-bar-danger" role="progressbar" [ngStyle]="{ 'width': ((row.noncomplaintkpis)/(row.complaintkpis+row.noncomplaintkpis)*100) + '%' }" style="height:100%">{{row.noncomplaintkpis}}</div>
+                                            </div>
+                                        <!-- </a> -->
+                                    </li>
+                                    <li><a>KPI non Compliant <button [disabled]="row.noncomplaintkpis==0" class="btn btn-danger pull-right badge bg-red" (click)="showNonCompliantModal(row.contractname)">{{row.noncomplaintkpis}}</button></a></li>
+                                    <li><a>KPI Compliant <button [disabled]="row.complaintkpis==0" class="btn btn-success pull-right badge bg-green" (click)="showCompliantModal(row.contractname)">{{row.complaintkpis}}</button></a></li>
+                                 </ul>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- -->
+                        <div [hidden]="row.complaintkpis == 0" class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">Better Performing Contracts</h3>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding table-responsive" style="height:350px">
+                                <table class="table table-striped">
+                                    <tr>
+                                      <th style="width: 10px; padding-left:10px">#</th>
+                                      <th style="padding-left:10px">KPI</th>
+                                      <!-- <th style="padding-left:10px">Result</th> -->
+                                      <th style="width: 40px; padding-left:50px">Valore</th>
+                                      <th style="width: 40px">Target</th>
+                                    </tr>
+                                    <tr *ngFor="let b of row.bestkpis; index as j">
+                                        <td>{{j+1}}.</td>
+                                        <td>{{b.kpiname}}</td>
+                                        <!-- <td><mat-progress-bar mode="determinate" [value]="b.value" style="width:200%; margin-top:10px"></mat-progress-bar></td> -->
+                                        <td class="center-td" style="padding-left:40px"><span class="badge bg-green">{{ b.value.toFixed(3) }}%</span></td>
+                                        <td class="center-td"><span class="badge bg-blue">{{b.target.toFixed(3)}}%</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- -->
+                        <div [hidden]="row.noncomplaintkpis == 0" class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">Under Performing Contracts</h3>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding table-responsive" style="height:350px">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th style="width: 10px; padding-left:10px">#</th>
+                                        <th style="padding-left:10px">KPI</th>
+                                        <!-- <th style="padding-left:10px">Result</th> -->
+                                        <th style="width: 40px; padding-left:50px">Valore</th>
+                                        <th style="width: 40px">Target</th>
+                                    </tr>
+                                    <tr *ngFor="let b of row.worstkpis; index as j">
+                                        <td>{{j+1}}.</td>
+                                        <td>{{b.kpiname}}</td>
+                                        <!-- <td><mat-progress-bar mode="determinate" [value]="b.value" style="width:200%; margin-top:10px"></mat-progress-bar></td> -->
+                                        <td class="center-td" style="padding-left:40px"><span class="badge bg-red">{{ b.value.toFixed(3) }}%</span></td>
+                                        <td class="center-td"><span class="badge bg-blue">{{b.target.toFixed(3)}}%</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <!-- ///////////////////////// -->
+
+    <section *ngIf="setViewAll==0" [hidden]="setThresholdValue==0" class="content">
+        <!-- Main row -->
+        <div class="row">
+            <section *ngFor="let row of limitedData; index as i" class="col-lg-3 connectedSortable ml-5">
+                <br>
+                <div [ngClass]="(row.noncomplaintkpis >= thresholdvalue)?'box box-danger box-solid':'box box-success box-solid'">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{row.contractname}}</h3>
+                        <!-- /.box-tools -->
+                    </div>
+                    <div class="box-body">
+                        <div class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">KPI</h3>
+                                <!-- /.box-tools -->
+                            </div>
+                            <!-- /.box-header -->
+
+                            <div class="box-footer no-padding">
+                                <ul class="nav nav-stacked">
+                                    <li>
+                                        <a>Numero KPI <span class="pull-right bold">{{row.totalkpis}}</span></a>
+                                    </li>
+                                    <li class="top-border">
+                                        <!-- <a href="#"> -->
+                                            Severity Contratti
+                                            <div class="progress" style="height: 20px">
+                                                <div class="progress-bar active progress-bar-success" role="progressbar" [ngStyle]="{ 'width': ((row.complaintkpis)/(row.complaintkpis+row.noncomplaintkpis)*100) + '%' }" style="height:100%">{{row.complaintkpis}}</div>
+                                                <div class="progress-bar active progress-bar-danger" role="progressbar" [ngStyle]="{ 'width': ((row.noncomplaintkpis)/(row.complaintkpis+row.noncomplaintkpis)*100) + '%' }" style="height:100%">{{row.noncomplaintkpis}}</div>
+                                            </div>
+                                        <!-- </a> -->
+                                    </li>
+                                    <li><a>KPI non Compliant <button [disabled]="row.noncomplaintkpis==0" class="btn btn-danger pull-right badge bg-red" (click)="showNonCompliantModal(row.contractname)">{{row.noncomplaintkpis}}</button></a></li>
+                                    <li><a>KPI Compliant <button [disabled]="row.complaintkpis==0" class="btn btn-success pull-right badge bg-green" (click)="showCompliantModal(row.contractname)">{{row.complaintkpis}}</button></a></li>
+                                 </ul>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- [hidden]="row.noncomplaintkpis >= thresholdvalue" -->
+                        <div [hidden]="row.complaintkpis == 0" class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">Better Performing Contracts</h3>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding table-responsive" style="height:350px">
+                                <table class="table table-striped">
+                                    <tr>
+                                      <th style="width: 10px; padding-left:10px">#</th>
+                                      <th style="padding-left:10px">KPI</th>
+                                      <!-- <th style="padding-left:10px">Result</th> -->
+                                      <th style="width: 40px; padding-left:50px">Valore</th>
+                                      <th style="width: 40px">Target</th>
+                                    </tr>
+                                    <tr *ngFor="let b of row.bestkpis; index as j">
+                                        <td>{{j+1}}.</td>
+                                        <td>{{b.kpiname}}</td>
+                                        <!-- <td><mat-progress-bar mode="determinate" [value]="b.value" style="width:200%; margin-top:10px"></mat-progress-bar></td> -->
+                                        <td class="center-td" style="padding-left:40px"><span class="badge bg-green">{{ b.value.toFixed(3) }}%</span></td>
+                                        <td class="center-td"><span class="badge bg-blue">{{b.target.toFixed(3)}}%</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- [hidden]="row.noncomplaintkpis < thresholdvalue"  -->
+                        <div [hidden]="row.noncomplaintkpis == 0" class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">Under Performing Contracts</h3>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding table-responsive" style="height:350px">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th style="width: 10px; padding-left:10px">#</th>
+                                        <th style="padding-left:10px">KPI</th>
+                                        <!-- <th style="padding-left:10px">Result</th> -->
+                                        <th style="width: 40px; padding-left:50px">Valore</th>
+                                        <th style="width: 40px">Target</th>
+                                    </tr>
+                                    <tr *ngFor="let b of row.worstkpis; index as j">
+                                        <td>{{j+1}}.</td>
+                                        <td>{{b.kpiname}}</td>
+                                        <!-- <td><mat-progress-bar mode="determinate" [value]="b.value" style="width:200%; margin-top:10px"></mat-progress-bar></td> -->
+                                        <td class="center-td" style="padding-left:40px"><span class="badge bg-red">{{ b.value.toFixed(3) }}%</span></td>
+                                        <td class="center-td"><span class="badge bg-blue">{{b.target.toFixed(3)}}%</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </section>
+
+
+    <section *ngIf="setViewAll==1" [hidden]="setThresholdValue==0" class="content">
+        <!-- Main row -->
+        <div class="row">
+            <section *ngFor="let row of gridsData; index as i" class="col-lg-3 connectedSortable ml-5">
+                <br>
+                <div [ngClass]="(row.noncomplaintkpis >= thresholdvalue)?'box box-danger box-solid':'box box-success box-solid'">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{row.contractname}}</h3>
+                        <!-- /.box-tools -->
+                    </div>
+                    <div class="box-body">
+                        <div class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">KPI</h3>
+                                <!-- /.box-tools -->
+                            </div>
+                            <!-- /.box-header -->
+
+                            <div class="box-footer no-padding">
+                                <ul class="nav nav-stacked">
+                                    <li>
+                                        <a>Numero KPI <span class="pull-right bold">{{row.totalkpis}}</span></a>
+                                    </li>
+                                    <li class="top-border">
+                                        <!-- <a href="#"> -->
+                                            Severity Contratti
+                                            <div class="progress" style="height: 20px">
+                                                <div class="progress-bar active progress-bar-success" role="progressbar" [ngStyle]="{ 'width': ((row.complaintkpis)/(row.complaintkpis+row.noncomplaintkpis)*100) + '%' }" style="height:100%">{{row.complaintkpis}}</div>
+                                                <div class="progress-bar active progress-bar-danger" role="progressbar" [ngStyle]="{ 'width': ((row.noncomplaintkpis)/(row.complaintkpis+row.noncomplaintkpis)*100) + '%' }" style="height:100%">{{row.noncomplaintkpis}}</div>
+                                            </div>
+                                        <!-- </a> -->
+                                    </li>
+                                    <li><a>KPI non Compliant <button [disabled]="row.noncomplaintkpis==0" class="btn btn-danger pull-right badge bg-red" (click)="showNonCompliantModal(row.contractname)">{{row.noncomplaintkpis}}</button></a></li>
+                                    <li><a>KPI Compliant <button [disabled]="row.complaintkpis==0" class="btn btn-success pull-right badge bg-green" (click)="showCompliantModal(row.contractname)">{{row.complaintkpis}}</button></a></li>
+                                 </ul>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- [hidden]="row.noncomplaintkpis >= thresholdvalue" -->
+                        <div [hidden]="row.complaintkpis == 0" class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">Better Performing Contracts</h3>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding table-responsive" style="height:350px">
+                                <table class="table table-striped">
+                                    <tr>
+                                      <th style="width: 10px; padding-left:10px">#</th>
+                                      <th style="padding-left:10px">KPI</th>
+                                      <!-- <th style="padding-left:10px">Result</th> -->
+                                      <th style="width: 40px; padding-left:50px">Valore</th>
+                                      <th style="width: 40px">Target</th>
+                                    </tr>
+                                    <tr *ngFor="let b of row.bestkpis; index as j">
+                                        <td>{{j+1}}.</td>
+                                        <td>{{b.kpiname}}</td>
+                                        <!-- <td><mat-progress-bar mode="determinate" [value]="b.value" style="width:200%; margin-top:10px"></mat-progress-bar></td> -->
+                                        <td class="center-td" style="padding-left:40px"><span class="badge bg-green">{{ b.value.toFixed(3) }}%</span></td>
+                                        <td class="center-td"><span class="badge bg-blue">{{b.target.toFixed(3)}}%</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- [hidden]="row.noncomplaintkpis < thresholdvalue"  -->
+                        <div [hidden]="row.noncomplaintkpis == 0" class="box box-default box-solid" style="border: 1px solid #999">
+                            <div class="box-header with-border" style="padding:5px;">
+                                <h3 class="box-title" style="font-size: 18px">Under Performing Contracts</h3>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding table-responsive" style="height:350px">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th style="width: 10px; padding-left:10px">#</th>
+                                        <th style="padding-left:10px">KPI</th>
+                                        <!-- <th style="padding-left:10px">Result</th> -->
+                                        <th style="width: 40px; padding-left:50px">Valore</th>
+                                        <th style="width: 40px">Target</th>
+                                    </tr>
+                                    <tr *ngFor="let b of row.worstkpis; index as j">
+                                        <td>{{j+1}}.</td>
+                                        <td>{{b.kpiname}}</td>
+                                        <!-- <td><mat-progress-bar mode="determinate" [value]="b.value" style="width:200%; margin-top:10px"></mat-progress-bar></td> -->
+                                        <td class="center-td" style="padding-left:40px"><span class="badge bg-red">{{ b.value.toFixed(3) }}%</span></td>
+                                        <td class="center-td"><span class="badge bg-blue">{{b.target.toFixed(3)}}%</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </section>
+</div><!--/.wrapper-->
+
+<div id="thresholdModal" bsModal #thresholdModal="bs-modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Threshold Settings</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideThresholdModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body row">
+                <div class="col-md-3">
+                    <h5>Threshold Red:</h5>
+                </div>
+                <div class="col-md-3" style="margin-top:-5px">
+                    <input type="text" class="form-control" [(ngModel)]="thresholdkey" placeholder="key" readonly>
+                </div>
+                <div class="col-md-2" style="margin-top:-5px">
+                    <input type="number" class="form-control" [(ngModel)]="thresholdvalue" placeholder="value">
+                </div>
+                <div class="col-md-1">
+                    <b> %</b>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" (click)="setThreshold()">Salva</button>
+                <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideThresholdModal()">Chiudi</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="compliantModal" bsModal #compliantModal="bs-modal" class="modal fade bs-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">KPI Compliants</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideCompliantModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- <button class="ml-2" #btnExporta>Esporta CSV</button><br> -->
+                <table class="table stripe CompliantTable" #CompliantTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+                    <thead class="thead-light2">
+                        <tr style="font-size:12px;color:white">
+                            
+                            
+                            <th style="text-align:center">Contraente</th>
+                            <th style="text-align:center; width:20%">Contratto</th>
+                            <th style="text-align:center; width:40%">KPI</th>
+                            <th style="text-align:center">Valore</th>
+                            <th style="text-align:center">Target</th>
+                            <th style="text-align:center">Operatore</th>
+                            <th style="text-align:center">Unità</th>
+                            
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <tr *ngFor="let row of KpiCompliants; index as i">
+                                
+                                <td style="text-align:center">{{contractpartyname}}</td>
+                                <td style="text-align:center; width:20%">{{selectedContract}}</td>
+                                <td style="width:40%">{{row.kpiname}}</td>
+                                <td style="text-align:center">{{row.value}}</td>
+                                <td style="text-align:center">{{row.target}}</td>
+                                <td style="text-align:center">{{row.operator}}</td>
+                                <td style="text-align:center">{{row.unit}}</td>
+                                
+                                
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideCompliantModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="nonCompliantModal" bsModal #nonCompliantModal="bs-modal" class="modal fade bs-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="classInfo"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">KPI non Compliants</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideNonCompliantModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table stripe" #nonCompliantTable datatable [dtOptions]="dtOptions2" [dtTrigger]="dtTrigger2">
+                    <thead class="thead-light2">
+                        <tr style="font-size:12px;color:white">
+                            <th style="text-align:center">Contraente</th>
+                            <th style="text-align:center; width:20%">Contratto</th>
+                            <th style="text-align:center; width:40%">KPI</th>
+                            <th style="text-align:center">Valore</th>
+                            <th style="text-align:center">Target</th>
+                            <th style="text-align:center">Operatore</th>
+                            <th style="text-align:center">Unità</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of KpiNonCompliants; index as i">
+                            <td style="text-align:center">{{contractpartyname}}  </td>
+                            <td style="text-align:center; width:20%">{{selectedContract}}  </td>
+                            <td style="width:40%">{{row.kpiname}}</td>
+                            <td style="text-align:center">{{row.value}}  </td>
+                            <td style="text-align:center">{{row.target}}  </td>
+                            <td style="text-align:center">{{row.operator}}  </td>
+                            <td style="text-align:center">{{row.unit}}  </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideNonCompliantModal()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>

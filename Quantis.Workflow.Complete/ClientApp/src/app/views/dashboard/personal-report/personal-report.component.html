@@ -1,0 +1,366 @@
+<div class="table-responsive bg-white p-3">
+  <h2>Report personali</h2><br>
+  <!-- <h5 *ngIf="loading" class="text-center text-primary" style="color:#eedc00 !important">
+      <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+  </h5> -->
+  <button class="btn btn-primary btn-sm float-right mb-3" (click)="showConfigModal()">
+    <i class="fa fa-cog"></i> Generate Report
+  </button>
+  <table class="table stripe text-center" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+    <thead class="bg-primary">
+      <tr class="text-white">
+        <th>Report Name</th>
+        <th>Contract Party</th>
+        <th>Contract</th>
+        <th style="width:30%">kpi</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of PersonalReportData; index as i">
+        <td>{{row.name}}</td>
+        <td>{{row.contract_party_name}}</td>
+        <td>{{row.contract_name}}</td>
+        <td style="width:30%">{{row.kpi_name}}</td>
+        <td>
+          <button class="btn btn-primary btn-sm pointer-cursor" (click)="editReport(row.id)">
+            <i class="fa fa-edit"></i>
+          </button>
+          <button class="btn btn-danger" [swal]="{title: 'Conferma', text: 'Eliminare il Report Personalli?', confirmButtonClass: 'btn btn-danger', showCancelButton: true, cancelButtonText: 'Annulla', confirmButtonText: 'Elimina'  }"
+                  (confirm)="DeletePersonalReport(row.id)" (cancel)="onCancel($event)" style="font-size:10px">
+            <i class="fa fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+    
+    <div bsModal #configModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-primary modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Create Report</h4>
+                    <button type="button" class="close text-white" (click)="configModal.hide()" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <!-- create dashboard model body start -->
+                    <form [formGroup]="personalReportForm" (ngSubmit)="onPersonalReportFormSubmit($event)">
+                        <div class="text-center" *ngIf="modalLoading">
+                            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Report Name</label>
+                            <input type="text" formControlName="name" class="form-control" placeholder="Report Name">
+                        </div>
+                         <div class="form-group">
+                            <label for="contractParties">Contract Parties</label>
+                            <select class="form-control" formControlName="contractParties" (change)="contractPartiesDropDown($event)">
+                            <option [selected]="!i" *ngFor="let org of allContractParties; let i = index"
+                                [value]="allContractParties[i].key">
+                                {{ allContractParties[i].value }}
+                            </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contracts">Contracts</label>
+                            <select class="form-control" formControlName="contracts" (change)="contractsDropDown($event)">
+                            <option [selected]="!i" *ngFor="let contract of filterContracts; let i = index"
+                                [value]="filterContracts[i].key">
+                                {{ filterContracts[i].value }}
+                            </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="GlobalRuleId">KPI's</label>
+                            <select class="form-control" formControlName="GlobalRuleId">
+                            <option [selected]="!i" *ngFor="let GlobalRuleId of filterKpis; let i = index" [value]="filterKpis[i].key">
+                                {{ filterKpis[i].value }}
+                            </option>
+                            </select>
+                        </div>
+                        <div class="form-group form-check">
+                          <input type="checkbox" formControlName="groupReportCheck" class="form-check-input"
+                            id="groupReportCheck">
+                          <label class="form-check-label" for="groupReportCheck">Group Report</label>
+                        </div>
+                        <span *ngIf="groupReportCheck">
+                          <div class="form-group">
+                            <label for="contractParties1">Contract Parties</label>
+                            <select class="form-control" formControlName="contractParties1"
+                              (change)="contractPartiesDropDown1($event)">
+                              <option [selected]="!i" *ngFor="let org of allContractParties1; let i = index"
+                                [value]="allContractParties1[i].key">
+                                {{ allContractParties1[i].value }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label for="contracts1">Contracts</label><!-- Date Type -->
+                            <select class="form-control" formControlName="contracts1" (change)="contractsDropDown1($event)">
+                              <option [selected]="!i" *ngFor="let contract of filterContracts1; let i = index"
+                                [value]="filterContracts1[i].key">
+                                {{ filterContracts1[i].value }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label for="GlobalRuleId1">KPI's</label><!-- Date Type -->
+                            <select class="form-control" formControlName="GlobalRuleId1">
+                              <option [selected]="!i" *ngFor="let GlobalRuleId of filterKpis1; let i = index"
+                                [value]="filterKpis1[i].key">
+                                {{ filterKpis1[i].value }}
+                              </option>
+                            </select>
+                          </div>
+                        </span>
+                        <div class="form-group">
+                            <label for="aggregationoption">Aggregazioni</label>
+                            <!-- Date Type -->
+                            <select class="form-control" formControlName="aggregationoption">
+                            <option [selected]="i" *ngFor="let aggr of allAggregationOptions; let i = index" [value]="allAggregationOptions[i].value">
+                                {{ allAggregationOptions[i].key }}
+                            </option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="startDate">Start Date</label>
+                                    <!-- [ngClass]="{ 'is-invalid': submitted && f.startDate.errors }" -->
+                                    <input type="text" formControlName="startDate" class="form-control" placeholder="Start Date" autocomplete="startDate" bsDatepicker [bsConfig]="{dateInputFormat: 'MM/YYYY',minMode: 'month', adaptivePosition: true}"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="endDate">End Date</label>
+                                    <!-- [ngClass]="{ 'is-invalid': submitted && f.endDate.errors }"  -->
+                                    <input type="text" formControlName="endDate" class="form-control" placeholder="End Date" autocomplete="endDate" bsDatepicker [bsConfig]="{dateInputFormat: 'MM/YYYY',minMode: 'month', adaptivePosition: true}">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- display name error -->
+
+                        <!-- <span *ngIf="submitted && f.name.errors && f.name.errors.required" class="text-danger mb-3">
+                        Dashboard name
+                        obbligatorio
+                        </span> -->
+                    <div class="row">
+                        <div class="col-6">
+                            <!-- [disabled]="formLoading" -->
+                            <button class="btn-sm btn btn-success" type="button" name="saveOnly" (click)="onPersonalReportFormSubmit('saveOnly')">Salva</button>
+                            <button type="submit" class="btn-sm btn btn-primary"><span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Salva & Apri
+                              <!-- <span *ngIf="formLoading" class="fa fa-spinner fa-spin"></span> Salva -->
+                          </button>
+                        </div>
+                    </div>
+                </form>
+                    <!-- create dashboard model body end -->
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+<div bsModal #personaliModal="bs-modal" class="modal fade bs-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+  <div class="modal-dialog modal-xl" style="width:90% !important;" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ReportData.name}}</h5>
+        <button type="button" class="close" aria-label="Close" (click)="hideModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- <perfect-scrollbar style="max-height: 500px;">   -->
+        <h5 *ngIf="loading" class="text-center text-primary" style="color:#eedc00 !important">
+            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+        </h5>
+        <div>
+          <div class="table-responsive">
+            <!-- <table class="table table-bordered freeFormReportTable font-12">
+              <thead>
+                <tr>
+                  <th>Contraente</th>
+                  <th>Contratto</th>
+                  <th>KPI</th>
+                  <th>Granularità dei dati</th>
+                  <th>Ultima Data di Calcolo</th>
+                  <th>Calculations Status Text</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ ReportDetailsData.contractparty }} </td>
+                  <td>{{ ReportDetailsData.contract }} </td>
+                  <td>{{ ReportDetailsData.rule }} </td>
+                  <td>{{ ReportDetailsData.datagranularity }} </td>
+                  <td>{{ ReportDetailsData.calculationstatuslastdate }}</td>
+                  <td>{{ ReportDetailsData.calculationstatustext }}</td>
+                </tr>
+              </tbody>
+            </table> -->
+            <br>
+            <!-- <div class="row">
+              
+              <h6 class="ml-3" style="color:#565656">Periodo:</h6>
+              <select [(ngModel)]="dayDrillPeriod" class="form-control ml-2" style="width:9%;margin-top:-8px" (change)="selectedPeriod()">
+                <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+              </select>
+            </div> -->
+            <div *ngIf="personalReportLength==1">
+                <div class="row">
+                  <h6 class="ml-3" style="color:#565656">Periodo:</h6>
+                  <select [(ngModel)]="dayDrillPeriod" class="form-control ml-2" style="width:10%;margin-top:-8px" (change)="selectedPeriod()">
+                    <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+                  </select>
+                </div>
+              <button class="btn btn-primary btn-sm float-right" (click)="chartClicked()"><i class="fa fa-table"></i></button>
+              <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions" [(update)]="chartUpdateFlag"
+              [oneToOne]="true" class="w-100p d-block one">
+              </highcharts-chart><br><br>
+            </div>
+
+            <div *ngIf="personalReportLength>1" class="row">
+              <div class="col-md-6">
+                  <div class="row">
+                    <h6 class="ml-3" style="color:#565656">Periodo:</h6>
+                    <select [(ngModel)]="dayDrillPeriod" class="form-control ml-2" style="width:20%;margin-top:-8px" (change)="selectedPeriod()">
+                      <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+                    </select>
+                  </div>
+                <button class="btn btn-primary btn-sm float-right" (click)="chartClicked()"><i class="fa fa-table"></i></button>
+                <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions" [(update)]="chartUpdateFlag"
+                [oneToOne]="true" class="w-100p d-block one">
+                </highcharts-chart><br><br>
+              </div>
+              <div class="col-md-6">
+                  <div class="row">
+                    <h6 class="ml-3" style="color:#565656">Periodo:</h6>
+                    <select [(ngModel)]="dayDrillPeriod2" class="form-control ml-2" style="width:20%;margin-top:-8px" (change)="selectedPeriod2()">
+                      <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary btn-sm float-right" (click)="chartClicked2()"><i class="fa fa-table"></i></button>
+                  <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions2" [(update)]="chartUpdateFlag2"
+                  [oneToOne]="true" class="w-100p d-block one">
+                  </highcharts-chart><br><br>
+                </div>
+            </div>
+
+          <highcharts-chart [hidden]="isDayDrill==0" [Highcharts]="highcharts" [options]="dayChartOptions" [(update)]="dayChartUpdateFlag"
+            [oneToOne]="true" style="width: 100%; display: block;">
+          </highcharts-chart><br><br>
+
+
+          <h5 *ngIf='loadingModalDati' id="loader" class="text-center">
+            <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+          </h5>
+          <div [hidden]="isLoadedDati==0" class="table-responsive" style="background: #ffffff; padding: 10px">
+            <div class="row">
+                <h5 class="ml-2" style="color:#565656;">Periodo:</h5>
+                <select [(ngModel)]="monthVar" class="form-control ml-2" style="width:15%;" (change)="selectedMonth($event)">
+                  <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+                </select>
+                <h6 class="float-right" style="color:#565656; margin-left: 90%; margin-top: -2%">{{selectedmonth}}/{{selectedyear}}</h6>
+                
+            </div><br>  
+            <table id="classTable" class="table table-bordered  font-12" #table>
+                  <thead class="thead-light2">
+                      <tr>
+                          <th style="text-align:center">create date</th>
+                          <th style="text-align:center">modify date</th>
+                          <th style="text-align:center">raw data id</th>
+                          <th style="text-align:center">event type</th>
+                          <th style="text-align:center">resource</th>
+                          <th style="text-align:center">time stamp</th>
+                          <th style="text-align:center">reader id</th>
+                          <th style="text-align:center">event state id</th>
+                          <th style="text-align:center">partner raw_data id</th>
+                          <th *ngFor="let key of countCampiData" style="text-align:center">campo {{key}}</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngIf="fitroDataById.length==0">
+                          <td class="font-italic text-center" colspan="12">
+                              Nessun dato per il periodo selezionato
+                          </td>
+                      </tr>
+                      <tr *ngFor="let rec of fitroDataById; index as i">
+                          <td style="text-align:center">{{rec.create_date }}</td>
+                          <td style="text-align:center">{{rec.modify_date }}</td>
+                          <td style="text-align:center">{{rec.raw_data_id}}</td>
+                          <td style="text-align:center">{{rec.event_type_id}}</td>
+                          <td style="text-align:center">{{rec.resource_id}}</td>
+                          <td style="text-align:center">{{rec.time_stamp }}</td>
+                          <td style="text-align:center">{{rec.reader_id}}</td>
+                          <td style="text-align:center">{{rec.event_state_id}}</td>
+                          <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                          <td style="text-align:center" *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+
+
+          <h5 *ngIf='loadingModalDati2' id="loader" class="text-center">
+            <span class="fa fa-spin fa-spinner fa-3x text-primary"></span>
+          </h5>
+          <div [hidden]="isLoadedDati2==0" class="table-responsive" style="background: #ffffff; padding: 10px">
+            <div class="row">
+                <h5 class="ml-2" style="color:#565656;">Periodo:</h5>
+                <select [(ngModel)]="monthVar2" class="form-control ml-2" style="width:15%;" (change)="selectedMonth($event)">
+                  <option *ngFor="let month of months; index as i" value={{month}}>{{month}}</option>
+                </select>
+                <h6 class="float-right" style="color:#565656; margin-left: 90%; margin-top: -2%">{{selectedmonth}}/{{selectedyear}}</h6>
+                
+            </div><br>  
+            <table id="classTable" class="table table-bordered  font-12" #table>
+                  <thead class="thead-light2">
+                      <tr>
+                          <th style="text-align:center">create date</th>
+                          <th style="text-align:center">modify date</th>
+                          <th style="text-align:center">raw data id</th>
+                          <th style="text-align:center">event type</th>
+                          <th style="text-align:center">resource</th>
+                          <th style="text-align:center">time stamp</th>
+                          <th style="text-align:center">reader id</th>
+                          <th style="text-align:center">event state id</th>
+                          <th style="text-align:center">partner raw_data id</th>
+                          <th *ngFor="let key of countCampiData" style="text-align:center">campo {{key}}</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngIf="fitroDataById2.length==0">
+                          <td class="font-italic text-center" colspan="12">
+                              Nessun dato per il periodo selezionato
+                          </td>
+                      </tr>
+                      <tr *ngFor="let rec of fitroDataById2; index as i">
+                          <td style="text-align:center">{{rec.create_date }}</td>
+                          <td style="text-align:center">{{rec.modify_date }}</td>
+                          <td style="text-align:center">{{rec.raw_data_id}}</td>
+                          <td style="text-align:center">{{rec.event_type_id}}</td>
+                          <td style="text-align:center">{{rec.resource_id}}</td>
+                          <td style="text-align:center">{{rec.time_stamp }}</td>
+                          <td style="text-align:center">{{rec.reader_id}}</td>
+                          <td style="text-align:center">{{rec.event_state_id}}</td>
+                          <td style="text-align:center">{{rec.partner_raw_data_id}}</td>
+                          <td style="text-align:center" *ngFor="let key of rec.data | keysPipe"><span *ngIf="rec.data[key] !== '##empty##'"><b>{{key}} :</b> {{rec.data[key] }}</span></td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- modal end -->

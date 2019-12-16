@@ -1,0 +1,76 @@
+<div style="margin-top: -20px;">
+    <div class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br />
+        <h2 style="color:#565656">DAY</h2><br>
+        <h5 *ngIf="loading" class="text-center text-primary" style="color:#eedc00 !important">
+            <span class="fa fa-spinner text-primary fa-spin fa-3x"></span><br /> Caricamento in corso..
+        </h5>
+        <table class="table stripe" #ConfigurationTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+            <thead class="thead-light2">
+                <tr style="font-size:12px;color:white">
+                    <th style="text-align:center">Day Number</th>
+                    <th style="text-align:center">Tickets to be opened today</th>
+                    <th style="text-align:center">Tickets opened today</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of organizationsData; index as i">
+                    <td style="text-align:center">{{row.daynumber}}</td>
+                    <td style="text-align:center"><button class="btn btn-success badge bg-green" (click)="noofticketstobeopenedtoday(row.ticketstobeopenedtoday)">{{row.noofticketstobeopenedtoday}}</button></td>
+                    <td style="text-align:center"><button class="btn btn-success badge bg-green" (click)="noofticketsopenedtoday(row.ticketsopenedtoday)">{{row.noofticketsopenedtoday}}</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div><br>
+    <div [hidden]="isticketstobeopenedtoday!=true" class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br />
+        <h3 style="color:#565656">{{title}}</h3>
+        <table class="table stripe" #SpecialValueTable datatable [dtOptions]="dtOptions2" [dtTrigger]="dtTrigger2">
+            <thead class="thead-light2">
+                <tr style="font-size:12px;color:white">
+                    <th style="text-align:center">Global Rule ID</th>
+                    <th style="text-align:center">Contract Party</th>
+                    <th style="text-align:center">Contract</th>
+                    <th style="text-align:center">Global Rule</th>
+                    <th style="text-align:center">Organization Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of ticketstobeopenedtoday; index as i">
+                    <td style="text-align:center">{{row.globalruleid}}</td>
+                    <td style="text-align:center">{{row.contractpartyname}}</td>
+                    <td style="text-align:center">{{row.contractname}}</td>
+                    <td style="text-align:center">{{row.globalrulename}}</td>
+                    <td style="text-align:center">{{row.organizationunitname}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div [hidden]="isticketsopenedtoday!=true" class="table-responsive" style="background: #ffffff; padding: 10px">
+        <br />
+        <h3 style="color:#565656">{{title}}</h3>
+        <table class="table stripe" #SpecialValueTable datatable [dtOptions]="dtOptions2" [dtTrigger]="dtTrigger2">
+            <thead class="thead-light2">
+                <tr style="font-size:12px;color:white">
+                    <th style="text-align:center">Global Rule ID</th>
+                    <th style="text-align:center">Contract Party</th>
+                    <th style="text-align:center">Contract</th>
+                    <th style="text-align:center">Global Rule</th>
+                    <th style="text-align:center">Organization Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of ticketsopenedtoday; index as i">
+                    <td style="text-align:center">{{row.globalruleid}}</td>
+                    <td style="text-align:center">{{row.contractpartyname}}</td>
+                    <td style="text-align:center">{{row.contractname}}</td>
+                    <td style="text-align:center">{{row.globalrulename}}</td>
+                    <td style="text-align:center">{{row.organizationunitname}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
