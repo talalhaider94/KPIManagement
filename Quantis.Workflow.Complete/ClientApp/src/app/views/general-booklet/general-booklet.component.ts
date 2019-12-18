@@ -13,11 +13,16 @@ var $this;
 })
 
 export class GeneralBookletComponent implements OnInit {
-    @ViewChild('addConfigModal') public addConfigModal: ModalDirective;
-    @ViewChild('configModal') public configModal: ModalDirective;
+    @ViewChild('thresholdModal') public thresholdModal: ModalDirective;
     @ViewChild('ConfigurationTable') block: ElementRef;
     @ViewChild(DataTableDirective) private datatableElement: DataTableDirective;
 
+    contractArray = [];
+    bookletArray = [];
+    documentId=0;
+    contractItem=0;
+    bookletItem=0;
+    validEmail;
     category_id: number = 0;
 
     dtOptions: DataTables.Settings = {
@@ -45,37 +50,16 @@ export class GeneralBookletComponent implements OnInit {
         }
     };
 
-    modalData = {
-        id: '',
-        handle: '',
-        name: '',
-        step: '',
-        category_id: 0
-    };
-
-    addData = {
-        handle: '',
-        name: '',
-        step: '',
-        category_id: 0
-    };
-
     dtTrigger: Subject<any> = new Subject();
-    ConfigTableBodyData: any = [
-        {
-            handle: 'handle',
-            name: 'name',
-            step: 1,
-            category: 'category'
-        }
-    ]
-
-    customersKP: any = [
-        {
-            key: '',
-            value: ''
-        }
-    ]
+    ConfigTableBodyData: any = [];
+    loading: boolean = false;
+    bookletStatus=0;
+    BookletContracts = [];
+    BookletContractsMain;
+    bookletContractsObj = {
+        ContractId:0,
+        BookletDocumentId:0
+    }
 
     constructor(
         private apiService: ApiService,
@@ -83,65 +67,8 @@ export class GeneralBookletComponent implements OnInit {
     ) {
         $this = this;
     }
-    public handle: any;
-    public name: any;
-    public step: any;
-    public category: any;
 
     ngOnInit() {
-    }
-
-    populateModalData(data) {
-        this.modalData.id = data.id;
-        this.modalData.handle = data.handle;
-        this.modalData.name = data.name;
-        this.modalData.step = data.step;
-        this.modalData.category_id = data.category_id;
-        this.showConfigModal();
-    }
-
-    add() {
-        this.addData.handle = this.handle;
-        this.addData.name = this.name;
-        this.addData.step = this.step;
-        this.addData.category_id = this.category_id;
-
-        this.toastr.info('Valore in aggiornamento..', 'Info');
-        this.apiService.addSDMGroup(this.addData).subscribe(data => {
-            this.getCOnfigurations(); // this should refresh the main table on page
-            this.toastr.success('Valore Aggiornato', 'Success');
-            this.hideAddConfigModal();
-            //$('#addConfigModal').modal('toggle').hide();
-        }, error => {
-            this.toastr.error('Errore durante update.', 'Error');
-            //$('#addConfigModal').modal('toggle').hide();
-            this.hideAddConfigModal();
-        });
-    }
-
-    updateConfig() {
-        //this.modalData.category_id = this.category_id;
-        this.toastr.info('Valore in aggiornamento..', 'Info');
-        this.apiService.updateSDMGroupConfig(this.modalData).subscribe(data => {
-            this.getCOnfigurations(); // this should refresh the main table on page
-            this.toastr.success('Valore Aggiornato', 'Success');
-            this.hideConfigModal();
-            //$('#configModal').modal('toggle').hide();
-        }, error => {
-            this.toastr.error('Errore durante update.', 'Error');
-            //$('#configModal').modal('toggle').hide();
-            this.hideConfigModal();
-        });
-    }
-
-    deleteSDMRow(data) {
-        this.toastr.info('Valore in aggiornamento..', 'Confirm');
-        this.apiService.deleteSDMGroupConfiguration(data.id).subscribe(data => {
-            this.getCOnfigurations(); // this should refresh the main table on page
-            this.toastr.success('Valore Aggiornato', 'Success');
-        }, error => {
-            this.toastr.error('Errore durante update.', 'Error');
-        });
     }
 
     ngAfterViewInit() {
@@ -186,19 +113,101 @@ export class GeneralBookletComponent implements OnInit {
         console.log('Cancel ', dismissMethod);
     }
 
-    showConfigModal() {
-        this.configModal.show();
+    showThresholdModal() {
+        this.thresholdModal.show();
     }
 
-    hideConfigModal() {
-        this.configModal.hide();
+    hideThresholdModal() {
+        this.thresholdModal.hide();
     }
 
-    showAddConfigModal() {
-        this.addConfigModal.show();
+
+    getId(obj){
+
+        this.bookletContractsObj.ContractId = obj.contractcontext;
+        this.bookletContractsObj.BookletDocumentId = obj.templateid;
+
+        this.BookletContractsMain = this.bookletContractsObj;
+        this.contractArray.push(obj.contractcontext);
+        // this.contractItem = 1;
+        // var index = this.contractArray.indexOf(obj.contractcontext);
+        // if(index === -1){
+        //   // val not found, pushing onto array
+        //   this.contractArray.push(obj.contractcontext);
+        // }else{
+        //   // val is found, removing from array
+        //   this.contractArray.splice(index,1);
+        // }
+        // if(this.contractArray.length == 0){
+        // this.contractItem = 0;
+        // }
+        // console.log('Contract IDs -> ',this.contractArray);
+
+        // //////////////////////
+
+
+        // this.bookletItem = 1;
+        // var index = this.bookletArray.indexOf(obj.reportid);
+        // if(index === -1){
+        //   // val not found, pushing onto array
+        //   this.bookletArray.push(obj.reportid);
+        // }else{
+        //   // val is found, removing from array
+        //   this.bookletArray.splice(index,1);
+        // }
+        // if(this.bookletArray.length == 0){
+        // this.bookletItem = 0;
+        // }
+        
+
     }
 
-    hideAddConfigModal() {
-        this.addConfigModal.hide();
+    addBooklet(){
+        let isValid ;
+        this.loading = true;
+         this.apiService.getCatalogEmailByUser().subscribe((data: any) => {
+            console.log('Email: ',data)
+            isValid = data;
+            if(data == null || data==''){
+                this.showThresholdModal();
+            }else{
+                this.validEmail = data;
+                this.createbooklet();               
+            }
+        });
+    }
+
+    createbooklet(){
+        this.BookletContracts.push(this.bookletContractsObj);
+        console.log('BookletContracts -> ',this.BookletContracts);
+        this.hideThresholdModal();
+        let count = this.contractArray.length;
+        if(this.validEmail != null || this.validEmail != ''){
+            let data = {
+                RecipientEmail:this.validEmail,
+                // BookletContracts:[{
+                // ContractId:'1511',
+                // BookletDocumentId:'7679'
+                // }]
+                BookletContracts:this.BookletContracts
+                
+            }
+            console.log(data);
+            this.apiService.CreateBooklet(data).subscribe((data: any) => {
+                console.log(data,' called createbooklet');
+                this.bookletStatus=1;
+                if(data==0 || data==null){
+                    this.toastr.error('Error', 'Error in adding booklet');
+                    this.loading = false;
+                }
+                else{
+                    this.toastr.success('Success', 'Al termine della elaborazione i booklet ('+count+') verranno inviati al seguente indirizzo : '+this.validEmail);
+                    this.loading = false;
+                }
+            },error=>{
+                this.bookletStatus=0;
+            });
+            //console.log('bookletStatus: ',this.bookletStatus) 
+        }
     }
 }
