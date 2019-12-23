@@ -154,7 +154,7 @@ export class CatalogoUtentiComponent implements OnInit {
         $(this.searchCol1.nativeElement).on('keyup', function () {
             $this.datatableElement.dtInstance.then((datatable_Ref: DataTables.Api) => {
                 datatable_Ref
-                    .columns(1)
+                    .columns(2)
                     .search(this.value)
                     .draw();
             });
@@ -162,7 +162,7 @@ export class CatalogoUtentiComponent implements OnInit {
         $(this.searchCol2.nativeElement).on('keyup', function () {
             $this.datatableElement.dtInstance.then((datatable_Ref: DataTables.Api) => {
                 datatable_Ref
-                    .columns(2)
+                    .columns(3)
                     .search(this.value)
                     .draw();
             });

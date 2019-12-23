@@ -49,15 +49,16 @@
                 </td>
                 <td>
                   <div class="text-center">
-                    <h1 style="font-size: 0.875rem;font-weight: 400;line-height: 1.5;" [ngClass]="formatInputDate(loadingForm.latest_input_date) === 'Nessun caricamento' ? 'badge badge-warning' : ''"><span style="display:none">{{ formatInputDate(loadingForm.latest_input_date) }}</span>
-                      {{ formatInputDateIT(loadingForm.latest_input_date) }}
+                    <h1 style="font-size: 0.875rem;font-weight: 400;line-height: 1.5;" [ngClass]="formatInputDate(loadingForm.latest_input_date) === 'Nessun caricamento' ? 'badge badge-warning' : ''">
+                      <span style="display:none">{{ formatInputDate(loadingForm.latest_input_date) }}</span>{{ formatInputDateIT(loadingForm.latest_input_date) }}
                     </h1>
+
                   </div>
                 </td>
                 <td>
                   <div class="text-center">
                     <a style="font-size:10px" class="btn btn-primary" data-toggle="modal"
-                       data-target="#uploadCSV" (click)="uploadCSV.show(); this.loadingPattern = loadingForm.form_name">
+                       data-target="#uploadCSV" (click)="uploadCSV.show(); this.loadingPattern = loadingForm.form_name; this.global_rule_id = loadingForm.global_rule_id">
                       <i class="fa fa-pencil"></i>
                     </a>
                   </div>

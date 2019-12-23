@@ -22,7 +22,8 @@ export class LoadingFormCsvComponent implements OnInit, OnDestroy {
   formId: string = null;
     loadingForms: any = [];
   detailsForms: any = {};
-  loadingPattern:string = '';
+  loadingPattern: string = '';
+  global_rule_id: 0;
     loading: boolean = true;
     @ViewChild(DataTableDirective)
     @ViewChild('showOnReady') showOnReady: ElementRef;
@@ -169,17 +170,6 @@ export class LoadingFormCsvComponent implements OnInit, OnDestroy {
             return 'N/A';
         }
     }
-  formatInputDateIT(date) {
-    if (date) {
-      if (moment(date).isSame(moment('0001-01-01T00:00:00'))) {
-        return 'Nessun caricamento';
-      } else {
-        return moment(date).format('DD/MM/YYYY HH:mm:ss');
-      }
-    } else {
-      return 'N/A';
-    }
-  }
   onFileSelected(event) {
     let period = moment().subtract(1, 'month').format('MM');
     let year = moment().format('YYYY');
@@ -231,18 +221,19 @@ export class LoadingFormCsvComponent implements OnInit, OnDestroy {
   
 
   _getUploadedFile(file, month, year) {
+    console.log(this.global_rule_id)
+    let global_rule_id = this.global_rule_id;
     this.fileUploading = true;
     const reader: FileReader = new FileReader();
     reader.onloadend = (function (theFile, self) {
       let fileName = theFile.name;
       return function (readerEvent) {
-        let formAttachments = {content:'', form_attachment_id: 0, form_id: 0, period: '', year: '', name: '', checksum: ''};
+        let formAttachments = { content: '', form_attachment_id: global_rule_id, form_id: global_rule_id, period: '', year: 0, name: '', checksum: ''};
         let binaryString = readerEvent.target.result;
         let base64Data = btoa(binaryString);
         let dateObj = self._getPeriodYear();
         formAttachments.content = base64Data;
-        formAttachments.form_attachment_id = 0;
-        formAttachments.period = month;
+        formAttachments.period = month + '/' + year;
         formAttachments.year = year;
         formAttachments.name = fileName;
         formAttachments.checksum = 'checksum';
@@ -318,5 +309,16 @@ export class LoadingFormCsvComponent implements OnInit, OnDestroy {
       mergeMap(error => retries-- > 0 ? of(error) : throwError(`Tried to upload ${maxRetry} times. without success.`))
     )
     ))
+  }
+  formatInputDateIT(date) {
+    if (date) {
+      if (moment(date).isSame(moment('0001-01-01T00:00:00'))) {
+        return 'Nessun caricamento';
+      } else {
+        return moment(date).format('DD/MM/YYYY HH:mm:ss');
+      }
+    } else {
+      return 'N/A';
+    }
   }
 }

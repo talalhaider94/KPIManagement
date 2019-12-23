@@ -55,7 +55,8 @@ export class CatalogoKpiComponent implements OnInit {
     @ViewChild('searchCol2') searchCol2: ElementRef;
     @ViewChild('searchCol3') searchCol3: ElementRef;
     @ViewChild('searchCol4') searchCol4: ElementRef;
-    @ViewChild('searchCol5') searchCol5: ElementRef;
+  @ViewChild('searchCol5') searchCol5: ElementRef;
+  @ViewChild('searchCol6') searchCol6: ElementRef;
     @ViewChild('btnExporta') btnExporta: ElementRef;
     @ViewChild('topScrollContainer') topScrollContainer: ElementRef;
     @ViewChild('topScroll') topScroll: ElementRef;
@@ -72,7 +73,8 @@ export class CatalogoKpiComponent implements OnInit {
             titoloBreve: '',
             referenti: '',
             tuttiContratti: '',
-            tutteLeFrequenze: ''
+          tutteLeFrequenze: '',
+          tutteLeCategorie: ''
         }
     };
 
@@ -245,7 +247,10 @@ export class CatalogoKpiComponent implements OnInit {
     
     }
 
-    populateModalData(data) {
+  populateModalData(row) {
+    this.modalLoading = true;
+    this.showReferentiModal();
+    this.apiService.getKpiByGlobalRuleId(row.global_rule_id_bsi).subscribe(data => {
         this.modalData.id = data.id;
         this.modalData.short_name = data.short_name;
         this.modalData.group_type = data.group_type;
@@ -277,8 +282,8 @@ export class CatalogoKpiComponent implements OnInit {
         this.modalData.frequency = data.frequency;
         this.modalData.month = data.month;
         this.modalData.day = data.day;
-      this.modalData.day_workflow = data.day_workflow;
-      this.modalData.day_cutoff = data.day_cutoff;
+        this.modalData.day_workflow = data.day_workflow;
+        this.modalData.day_cutoff = data.day_cutoff;
         this.modalData.daytrigger = data.daytrigger;
         this.modalData.monthtrigger = data.monthtrigger;
         this.modalData.enable = data.enable;
@@ -297,9 +302,14 @@ export class CatalogoKpiComponent implements OnInit {
         this.modalData.global_rule_id_bsi = data.global_rule_id_bsi;
       this.modalData.sla_id_bsi = data.sla_id_bsi;
       this.modalData.progressive = data.progressive;
+      this.modalLoading = false;
+    }, error => {
+      this.modalLoading = false;
+      this.hideReferentiModal();
+      this.toastr.error('Errore server.', 'Error');
+    });
 
-        this.showReferentiModal();
-    }
+  }
 
   populateKpiModalData(row) {
     this.modalLoading = true;
@@ -323,6 +333,8 @@ export class CatalogoKpiComponent implements OnInit {
       this.modalData.kpi_category = data.kpi_category == null ? '' : data.kpi_category;
       this.modalData.escalation = data.escalation;
       this.modalData.target = data.target;
+      var target = this.splitTarget(data.target)
+      console.log(target);
       this.modalData.penalty_value = data.penalty_value;
       this.modalData.source_name = data.source_name;
       this.modalData.organization_unit = data.organization_unit == null ? '' : data.organization_unit;
@@ -366,7 +378,19 @@ export class CatalogoKpiComponent implements OnInit {
     });
         
     }
-
+    splitTarget(targetInput) {
+      let array = { operator: '', number: '', symbol: '' };
+      if (targetInput) {
+        let target = targetInput.replace(/\s/g, '');
+        var numbers = target.replace(/[^0-9\d+\.\,\-]/g, '');
+        var operator = target.replace(/[^<\>\=]/g, '');
+        var symbols = target.split(numbers).pop();
+        array.operator = operator;
+        array.number = numbers;
+        array.symbol = symbols;
+      }
+      return array;
+    }
     updateKpi(modal) {
         if(this.modalData.kpi_category != 'C' && this.modalData.kpi_category != 'O' && this.modalData.kpi_category != 'F'){
             this.toastr.warning('Categoria obbligatoria!', 'Warning');
@@ -488,7 +512,16 @@ export class CatalogoKpiComponent implements OnInit {
               .search(this.value)
               .draw();
           });
+      });
+      $(this.searchCol6.nativeElement).on('change', function () {
+        console.log(this.value)
+        $this.datatableElement.dtInstance.then((datatable_Ref: DataTables.Api) => {
+          datatable_Ref
+            .columns(31)
+            .search(this.value)
+            .draw();
         });
+      });
         /*$this.datatableElement.dtInstance.then((datatable_Ref: DataTables.Api) => {
           datatable_Ref.columns(5).every(function () {
             const that = this;

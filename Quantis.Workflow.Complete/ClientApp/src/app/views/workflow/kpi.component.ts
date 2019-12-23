@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { WorkFlowService } from '../../_services';
 import { FileHelpersService } from '../../_helpers';
-import { first, delay, mergeMap, retryWhen, concatMap, map } from 'rxjs/operators';
+import { first, delay, mergeMap, retryWhen, concatMap, map, catchError } from 'rxjs/operators';
 import { Subject, Observable, of, throwError } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -247,9 +247,13 @@ export class KPIComponent implements OnInit, OnDestroy {
             next: status => {
                 this.ticketsStatus.push(status);
             },
-            error: err => {
+            error: error => {
+                /*
+                    FROM: Danial
+                    COMMENT: Error has already been thrown. This error callback should never run.
+                */
                 this.approveModal.hide();
-                console.error('approveFormSubmit', err);
+                console.error('approveFormSubmit It should not be called', error);
                 this.toastr.error('Error while approving form', 'Error');
                 this.loading = false;
             },
@@ -261,7 +265,14 @@ export class KPIComponent implements OnInit, OnDestroy {
 
         of(...this.selectedTickets)
             .pipe(concatMap((ticket) => {
-                return this.workFlowService.escalateTicketbyID(ticket.id, ticket.status, description.value || null).pipe(map(result => {
+                return this.workFlowService.escalateTicketbyID(ticket.id, ticket.status, description.value || null).pipe(catchError(error => {
+                    /*
+                        FROM: Danial
+                        COMMENT: returning undefine in of() will just return the error and will
+                        prevent API server call from stopping execution.
+                    */
+                    return of({ticket});
+                }),map(result => {
                     // Danial: here just for testing
                     // result = {
                     //   isbsistatuschanged: true,
@@ -301,7 +312,14 @@ export class KPIComponent implements OnInit, OnDestroy {
             };
             of(...this.selectedTickets)
                 .pipe(concatMap((ticket) => {
-                    return this.workFlowService.transferTicketByID(ticket.id, ticket.status, description.value || null).pipe(map(result => {
+                    return this.workFlowService.transferTicketByID(ticket.id, ticket.status, description.value || null).pipe(catchError(error => {
+                        /*
+                            FROM: Danial
+                            COMMENT: returning undefine in of() will just return the error and will
+                            prevent API server call from stopping execution.
+                        */
+                        return of({ticket});
+                    }), map(result => {
                         return { ticket, result };
                     }));
                 })).subscribe(myObserver);

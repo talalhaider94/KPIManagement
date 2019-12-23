@@ -6,7 +6,5 @@
 export const environment = {
   production: false,
   API_URL: 'http://10.10.10.102/api', //cloud
-  //API_URL: window.location.protocol !== 'https:' ? 'http://localhost:5000/api' : 'https://localhost:5001/api', //localhost
-  //API_URL: window.location.protocol !== 'https:' ? 'https://kpimanagement.posteitaliane.it/api' : 'http://localhost:5000/api', //web poste collaudo
-  //API_URL: 'http://10.183.139.86/api' //web poste collaudo
+  //API_URL: 'https://localhost:5001/api', //localhost
 };

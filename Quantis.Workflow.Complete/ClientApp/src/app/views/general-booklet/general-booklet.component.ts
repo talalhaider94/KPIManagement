@@ -106,7 +106,6 @@ export class GeneralBookletComponent implements OnInit {
       this.ConfigTableBodyData = data;
       console.log('Booklets ', data);
       this.rerender();
-      //this.contractArray.length=0;
     });
   }
 

@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
     submitted: boolean = false;
     returnUrl: string;
   loading: boolean = false;
+  browserSupported: boolean = false;
   checkSiteminder: boolean = false;
     public showLandingPage: any;
     constructor(
@@ -37,7 +38,8 @@ export class LoginComponent implements OnInit {
     get f() { return this.loginForm.controls; }
 
   ngOnInit() {
-
+    this.browserSupported = this.getBrowserName();
+    console.log(this.browserSupported);
     ////// START SITEMINDER LOGIN ///////////////////////////////////////////////////
     this.checkSiteminder = true;
     this.authService.checkLogin().pipe(first()).subscribe(data => {
@@ -79,6 +81,27 @@ export class LoginComponent implements OnInit {
         //this.returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/coming-soon';
         this.returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '**';
     }
+
+  getBrowserName() {
+    const agent = window.navigator.userAgent.toLowerCase()
+    console.log(agent)
+    switch (true) {
+      case agent.indexOf('edge') > -1:
+        return false;
+      case agent.indexOf('opr') > -1 && !!(<any>window).opr:
+        return false;
+      case agent.indexOf('chrome') > -1 && !!(<any>window).chrome:
+        return true;
+      case agent.indexOf('trident') > -1:
+        return false;
+      case agent.indexOf('firefox') > -1:
+        return true;
+      case agent.indexOf('safari') > -1:
+        return false;
+      default:
+        return false;
+    }
+  }
 
     onLoginFormSubmit() {
         this.submitted = true;

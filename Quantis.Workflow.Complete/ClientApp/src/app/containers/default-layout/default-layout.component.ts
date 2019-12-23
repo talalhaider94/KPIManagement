@@ -6,9 +6,8 @@ import { AuthService } from '../../_services';
 import { Router, NavigationEnd } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { filter } from 'rxjs/operators';
-import { ObservableLike } from 'rxjs';
 import { DashboardService, EmitterService } from '../../_services';
-import { WidgetModel, DashboardModel } from "../../_models";
+import { DashboardModel } from "../../_models";
 
 @Component({
     selector: 'app-dashboard',
@@ -28,7 +27,7 @@ export class DefaultLayoutComponent implements OnDestroy, OnInit {
     loadingDashboard: boolean = false;
     dashboardCollection: DashboardModel[];
     public showLandingPage: any;
-    showPowerBI=0;
+    showPowerBI = 0;
     public showAboutPage: boolean = false;
 
     constructor(
@@ -57,14 +56,26 @@ export class DefaultLayoutComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        this.showPowerBI=0;
-        let x = JSON.parse(localStorage.getItem('currentUser'));
-        let perm = x.permissions;
-        if(perm.indexOf('VIEW_LINK_POWERBI') > -1){
-            this.showPowerBI=1;
+        /*
+        FROM: Danial
+        EMAIL: danialmunsif@gmail.com
+        MSG: Please use reuse code from authService for user. and put condition for every possible scenario 
+        */
+        this.showPowerBI = 0;
+        this.currentUser = this.authService.getUser();
+        if (this.currentUser) {
+            const userPermissions = this.currentUser.permissions;
+            if (userPermissions) {
+                if (userPermissions.indexOf('VIEW_LINK_POWERBI') > -1) {
+                    this.showPowerBI = 1;
+                }
+            } else {
+                console.warn('User permissions not found');
+            }
+        } else {
+            console.warn('No user found.');
         }
 
-        this.currentUser = this.authService.getUser();
         this.router.events.pipe(
             filter((event: any) => event instanceof NavigationEnd)
         ).subscribe(x => {
@@ -150,17 +161,30 @@ export class DefaultLayoutComponent implements OnDestroy, OnInit {
 
     dashboardList() {
         //this.router.navigate(['/dashboard/list']);
-        let x = JSON.parse(localStorage.getItem('currentUser'));
-        let dashboardid = x.defaultdashboardid;
 
-        if(dashboardid==-1){
-            this.router.navigate(['/dashboard/landingpage']);
-        }else if(dashboardid!=-1){
-            this.router.navigate(['/dashboard/public', dashboardid]);
-        }else{
-            this.router.navigate(['dashboard/nodashboard']);
-        }
-        //console.log('dashboardid: ',dashboardid);
+        this.dashboardService.getLandingPageInfo().subscribe(data => {
+            this.showLandingPage = data.showlandingpage;
+            //console.log("Landing Page Info -> ",data.showlandingpage);
+
+            if (this.showLandingPage == true) { 
+                this.router.navigate(['/dashboard/landingpage']);
+            } else {
+                let x = JSON.parse(localStorage.getItem('currentUser'));
+                let dashboardid = x.defaultdashboardid;
+
+                // if(dashboardid==-1){
+                //     this.router.navigate(['/dashboard/landingpage']);
+                // }
+                if (dashboardid != -1) {
+                    this.router.navigate(['/dashboard/public', dashboardid]);
+                } else {
+                    this.router.navigate(['dashboard/nodashboard']);
+                }
+                console.log('dashboardid: ', dashboardid);
+            }
+
+        });
+
     }
 
     dashboardNavigation(id) {
@@ -224,7 +248,7 @@ export class DefaultLayoutComponent implements OnDestroy, OnInit {
         });
     }
 
-    powerBI(){
+    powerBI() {
         window.open("https://rapid.posteitaliane.it", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,width=1200,height=1200");
     }
 }

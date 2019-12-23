@@ -41,7 +41,20 @@ export class DateTimeService {
       return 'N/A';
     }
   }
-
+  convertUtcToDateTimeIT(date) {
+    if (date) {
+      return moment(date).format('DD/MM/YYYY, HH:mm')
+    } else {
+      return 'N/A';
+    }
+  }
+  convertUtcToDateTimeYYYY(date) {
+    if (date) {
+      return moment(date).format('YYYY/MM/DD, HH:mm')
+    } else {
+      return 'N/A';
+    }
+  }
   sortDate(data){
     if(data && data.length === 0){
       return [];

@@ -1,5 +1,7 @@
 export const pageVersion = {
     '/dashboard/list': '1.0.5',
+    '/dashboard/landingpage': '0.0.5',
+    '/dashboard/landing-page-details': '0.0.5',
     '/workflow/verifica': '0.1.5',
     '/workflow/ricerca': '0.1.5',
     '/workflow/amministrazione': '0.0.2',

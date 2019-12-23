@@ -150,4 +150,5 @@ export class LoadingFormUserComponent implements OnInit, OnDestroy {
       return 'N/A';
     }
   }
+
 }

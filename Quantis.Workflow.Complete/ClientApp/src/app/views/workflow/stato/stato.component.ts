@@ -42,6 +42,7 @@ export class StatoComponent implements OnInit {
     isticketsopenedtilltoday=false;
     isticketstobeopenedforcompleteperiod=false;
     isticketstobeopenedtilltoday=false;
+    isSecondTable=0;
 
     isticketstobeopenedtoday=false;
     isticketsopenedtoday=false;
@@ -209,6 +210,8 @@ export class StatoComponent implements OnInit {
             },
             destroy:true
         };
+        this.GetAllOrganizationUnits();
+        this.GetMonitoringDay();        
     }
 
     ngAfterViewInit() {
@@ -216,9 +219,6 @@ export class StatoComponent implements OnInit {
         this.dtTrigger2.next();
         this.dtTrigger3.next();
         this.dtTrigger4.next();
-        
-        this.GetAllOrganizationUnits();
-        this.GetMonitoringDay();
     }
 
     ngOnDestroy(): void {
@@ -239,10 +239,20 @@ export class StatoComponent implements OnInit {
             //     this.dtTrigger3.next();
             //     this.dtTrigger4.next();
             //   }
-              this.dtTrigger.next();
+            this.dtTrigger.next();
+            this.dtTrigger2.next();
+            this.dtTrigger3.next();
+            this.dtTrigger4.next();
+            });
+        });
+        this.setUpDataTableDependencies();
+    }
+
+    rerender2(): void {
+        this.datatableElements.forEach((dtElement: DataTableDirective) => {
+            dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+              dtInstance.destroy();
               this.dtTrigger2.next();
-              this.dtTrigger3.next();
-              this.dtTrigger4.next();
             });
         });
         this.setUpDataTableDependencies();
@@ -295,7 +305,7 @@ export class StatoComponent implements OnInit {
         console.log('Cancel ', dismissMethod);
     }
 
-    noofticketsopenedtilltoday(data){    
+    noofticketsopenedtilltoday(data){   
         this.isStatoPeriod=0;
         this.isticketsopenedtilltoday=true;
         this.isticketstobeopenedforcompleteperiod=false;
@@ -306,7 +316,6 @@ export class StatoComponent implements OnInit {
             this.title='Ticket aperti ad oggi';
         }
         this.ticketsopenedtilltoday = data;
-        this.render_number=2;
         this.rerender();
     }
 
@@ -317,7 +326,6 @@ export class StatoComponent implements OnInit {
         this.isticketstobeopenedtilltoday=false;
         this.title ='Ticket da aprire nel periodo';
         this.ticketstobeopenedforcompleteperiod = data;
-        this.render_number=2;
         this.rerender();
     }
 
@@ -328,7 +336,6 @@ export class StatoComponent implements OnInit {
         this.isticketsopenedtilltoday=false;
         this.title='Ticket da aprire ad oggi';
         this.ticketstobeopenedtilltoday = data;
-        this.render_number=2;
         this.rerender();
     }
 

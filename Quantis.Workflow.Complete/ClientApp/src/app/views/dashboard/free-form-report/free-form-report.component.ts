@@ -6,6 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 import { DataTableDirective } from 'angular-datatables';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import * as XLSX from 'xlsx';
+import { fireEvent } from 'highcharts';
 // import {ExcelService} from '../../../_services/excel.service';
 
 let $this;
@@ -21,7 +23,7 @@ export class FreeFormReportComponent implements OnInit {
   @ViewChild('executeModal') public executeModal: ModalDirective;
   @ViewChild('parametersModal') public parametersModal: ModalDirective;
   @ViewChild('btnExporta') btnExporta: ElementRef;
-
+  @ViewChild('queryTable') queryTable: ElementRef;
   assignedReportQueries: any = [];
   assignedQueriesBodyData: any = [];
   viewAssignedData: any = [];
@@ -68,14 +70,14 @@ export class FreeFormReportComponent implements OnInit {
     }]
   }
   executeQueryData = {
-    QueryText: '', 
+    QueryText: '',
     Parameters: [{
       key: '',
       value: ''
     }]
   }
 
-  modalTitle: string = 'Users Assigned Queries';
+  modalTitle: string = 'Utenti assegnati';
   assigendModalTitle: string = 'Free Form Report Assegnati';
   ownedModalTitle: string = 'Propri Free Form Report';
   executeModalTitle: string = '';
@@ -116,7 +118,7 @@ export class FreeFormReportComponent implements OnInit {
   get f() { return this.addEditQueryForm.controls; }
 
   ngOnInit() {
-
+    $(this.btnExporta.nativeElement).hide();
     this.getReportQueryDetailByID();
     this.isDisabled=0;
     this.isEnabled=0;
@@ -238,6 +240,9 @@ export class FreeFormReportComponent implements OnInit {
   }
 
   deleteParameters(id: number) {
+    if(this.parameterCount==0){
+      this.Parameters = this.addEditQueryForm.get('Parameters') as FormArray;
+    }
     console.log('remove index: ',id);
     this.Parameters.removeAt(id);
   }
@@ -275,7 +280,8 @@ export class FreeFormReportComponent implements OnInit {
   getReportsData() {
     const $assignedReportQueries = this._freeFormReport.getAssignedReportQueries();
     const $ownedReportQueries = this._freeFormReport.getOwnedReportQueries();
-
+    console.log($assignedReportQueries, $ownedReportQueries);
+    
     forkJoin([$assignedReportQueries, $ownedReportQueries]).subscribe(result => {
       if (result) {
         const [assignedReportQueries, ownedReportQueries] = result;
@@ -367,7 +373,8 @@ export class FreeFormReportComponent implements OnInit {
           event.preventDefault();
           event.stopPropagation();
           //$this.datatableElement.dtInstance.then((datatable_Ref: DataTables.Api) => {
-            $this.table2csv('full', '.executedQueryResult');
+        //$this.table2csv('full', '.executedQueryResult');
+        $this.fireEvent();
               /*if ($this.viewModel.filters.idKpi || $this.viewModel.filters.titoloBreve || $this.viewModel.filters.referenti || $this.viewModel.filters.tuttiContratti || $this.viewModel.filters.tutteLeFrequenze) {
                   $this.table2csv(datatable_Ref, 'visible', '.kpiTable');
               } else {
@@ -381,9 +388,12 @@ export class FreeFormReportComponent implements OnInit {
   }
 
   populateAssignedUsers(data,event){
-    if(event.target.checked==true){
-      this.assignedUsers[this.count] = data.ca_bsi_user_id;
-      this.count++;
+    if (event.target.checked == true) {
+      this.assignedUsers.push(data.ca_bsi_user_id);
+      console.log(this.assignedUsers)
+      //this.count++;
+    } else {
+      this.assignedUsers.splice(this.assignedUsers.indexOf(data.ca_bsi_user_id),1);
     }
   }
 
@@ -441,10 +451,19 @@ export class FreeFormReportComponent implements OnInit {
   }
 
   showConfigModal(row) {
+    this.assignedUsers = [];
+    //this.count = 0;
     this.queryId = row.id;
     this._freeFormReport.GetAllUsersAssignedQueries(row.id).subscribe(data => {
       //console.log('GetAllUsersAssignedQueries -> ',data);
       this.assignedQueriesBodyData = data;
+      data.forEach(e => {
+        if (e.isassigned === true) {
+          console.log(this.assignedUsers)
+          this.assignedUsers.push(e.ca_bsi_user_id);
+          //this.count++;
+        }
+      });
       this.configModal.show();
      });
   }
@@ -566,6 +585,12 @@ export class FreeFormReportComponent implements OnInit {
       var blob = new Blob([csv], { type: "text/plain;charset=utf-8" });
       saveAs(blob, "ExportKPITable.csv");
   }
+  fireEvent() {
+    const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(this.queryTable.nativeElement);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, 'ReportExport.xlsx');
+  }
   clearData(){
     this.debugQueryData = [];
     this.debugQueryValue = [];
@@ -640,11 +665,11 @@ export class FreeFormReportComponent implements OnInit {
     //console.log('Debug -> ',this.executeQueryData);
     this._freeFormReport.ExecuteReportQuery(this.executeQueryData).subscribe(data => {
       this.debugResult = data;
+      
       console.log('Debug Result -> ',this.debugResult);
       if(this.debugResult.length==0){
         //this.toastr.error('Errore in query execution', 'Error');
-        this.loadingResult = false;
-        this.debugResult = [{'Nessun Dato trovato': 'Nessun Dato'}]
+        this.debugResult = [{Error: 'No data found'}]
         this.debugQueryData = Object.keys(this.debugResult[0]);
       }else{
 
@@ -662,12 +687,12 @@ export class FreeFormReportComponent implements OnInit {
         this.isDebug=1;
         if(data[0]=='O'){
           this.toastr.error('Errore esecuzione Free Form Report. ' +this.debugResult, 'Error');
-          this.loadingResult = false;
-          this.debugResult = [{'Nessun Dato trovato': 'Nessun Dato'}]
+          this.debugResult = [{Error: 'No data found'}]
           this.debugQueryData = Object.keys(this.debugResult[0]);
           this.hideData=1;
         }else{
           ////////////// Setting Key ///////////////
+          $('#btnExporta').show();
           this.debugQueryData = Object.keys(data[0]);
           setTimeout(() => {
           this.dtTrigger3.next();
@@ -682,7 +707,8 @@ export class FreeFormReportComponent implements OnInit {
     this.hideParametersModal();
   }
 
-  test(){
+  test() {
+    
     this.hideData=0;
     this.valueCount = 0;
     this.loadingResult = true;
@@ -692,21 +718,18 @@ export class FreeFormReportComponent implements OnInit {
     this.executeQueryData.Parameters = this.addEditQueryForm.value.Parameters;
     this._freeFormReport.ExecuteReportQuery(this.executeQueryData).subscribe(data => {
       this.debugResult = data;
-
+      //this.hideExport = false;
       if(this.debugResult.length==0){
-        this.loadingResult = false;
-        this.debugResult = [{'Nessun Dato trovato': 'Nessun Dato'}]
+        this.debugResult = [{Error: 'No data found'}]
         this.debugQueryData = Object.keys(this.debugResult[0]);
       }else{
         ////////////// Setting Key ///////////////
         //this.debugQueryData = Object.keys(data[0]);
 
-        this.isDebug=1;
-
+        this.isDebug = 1;
         if(data[0]=='O'){
           this.toastr.error('Errore esecuzione Free Form Report. ' +this.debugResult, 'Error');
-          this.loadingResult = false;
-          this.debugResult = [{'Nessun Dato trovato': 'Nessun Dato'}]
+          this.debugResult = [{Error: 'No data found'}]
           this.debugQueryData = Object.keys(this.debugResult[0]);
           this.hideData=1;
         }else{
@@ -724,11 +747,13 @@ export class FreeFormReportComponent implements OnInit {
           // }
 
           console.log(this.debugQueryData[0]);
+          $('#btnExporta').show();
           //debugger;
           setTimeout(() => {
           this.dtTrigger3.next();
            this.rerender();
-           this.loadingResult = false;
+            this.loadingResult = false;
+            this.hideExport = false;
           }, 2000);
         }
       }

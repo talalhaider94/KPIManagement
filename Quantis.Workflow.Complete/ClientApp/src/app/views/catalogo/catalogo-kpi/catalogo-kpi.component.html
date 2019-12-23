@@ -2,25 +2,32 @@
     <br />
     <div class="table-responsive" style="background: #ffffff; padding: 5px; height:100%; width: 100%;">
         <br><h2 style="color:#565656">Catalogo KPI</h2><br>
-        <div class="row">
-            <input type="text" class="form-control ml-3 mr-1" style="width:15%;" placeholder="ID KPI" #searchCol1 [(ngModel)]="viewModel.filters.idKpi" name="idKpi" />
-            <input type="text" class="form-control ml-1 mr-1" style="width:15%;" placeholder="Titolo Breve" #searchCol2 [(ngModel)]="viewModel.filters.titoloBreve" name="titoloBreve" />
-            <input type="text" class="form-control ml-1 mr-1" style="width:15%;" placeholder="Referenti" #searchCol3 [(ngModel)]="viewModel.filters.referenti" name="referenti" />
-            <span>&nbsp;&nbsp;</span>
-            <select class="form-control" style="width:15%;" #searchCol4 [(ngModel)]="viewModel.filters.tuttiContratti" name="tuttiContratti"><option value="">Tutti i Contratti</option></select>
-            <span>&nbsp;&nbsp;</span>
-            <select class="form-control" style="width:15%;" #searchCol5 [(ngModel)]="viewModel.filters.tutteLeFrequenze" name="tutteLeFrequenze">
-                <option value="">Tutte le Frequenze</option>
-                <option value="MENSILE">MENSILE</option>
-                <option value="TRIMESTRALE">TRIMESTRALE</option>
-                <option value="QUADRIMESTRALE">QUADRIMESTRALE</option>
-                <option value="SEMESTRALE">SEMESTRALE</option>
-                <option value="ANNUALE">ANNUALE</option>
-            </select>
-            <span>&nbsp;&nbsp;</span>
-            <button class="ml-2" #btnExporta>Esporta CSV</button>
-            <!-- <button class="btn btn-primary ml-2" (click)="reload()">Refresh Table</button> -->
-        </div><br />
+                                                <div class="row">
+                                                  <input type="text" class="form-control ml-3 mr-1" style="width: 200px;" placeholder="ID KPI" #searchCol1 [(ngModel)]="viewModel.filters.idKpi" name="idKpi" />
+                                                  <input type="text" class="form-control ml-1 mr-1" style="width: 200px;" placeholder="Titolo Breve" #searchCol2 [(ngModel)]="viewModel.filters.titoloBreve" name="titoloBreve" />
+                                                  <input type="text" class="form-control ml-1 mr-1" style="width: 200px;" placeholder="Referenti" #searchCol3 [(ngModel)]="viewModel.filters.referenti" name="referenti" />
+                                                  <span>&nbsp;&nbsp;</span>
+                                                  <select class="form-control" style="width:15%;" #searchCol4 [(ngModel)]="viewModel.filters.tuttiContratti" name="tuttiContratti"><option value="">Tutti i Contratti</option></select>
+                                                  <span>&nbsp;&nbsp;</span>
+                                                  <select class="form-control" style="width: 170px;" #searchCol5 [(ngModel)]="viewModel.filters.tutteLeFrequenze" name="tutteLeFrequenze">
+                                                    <option value="">Tutte le Frequenze</option>
+                                                    <option value="MENSILE">MENSILE</option>
+                                                    <option value="TRIMESTRALE">TRIMESTRALE</option>
+                                                    <option value="QUADRIMESTRALE">QUADRIMESTRALE</option>
+                                                    <option value="SEMESTRALE">SEMESTRALE</option>
+                                                    <option value="ANNUALE">ANNUALE</option>
+                                                  </select>
+                                                  <span>&nbsp;&nbsp;</span>
+                                                  <select class="form-control" style="width:170px;" #searchCol6 [(ngModel)]="viewModel.filters.tutteLeCategorie" name="tutteLeCategorie">
+                                                    <option value="">Tutte le Categorie</option>
+                                                    <option value="C">CONTRATTUALE</option>
+                                                    <option value="F">FINANZIARIO</option>
+                                                    <option value="O">OPERATIVO</option>
+                                                  </select>
+                                                  <span>&nbsp;&nbsp;</span>
+                                                  <button class="ml-2" #btnExporta>Esporta CSV</button>
+                                                  <!-- <button class="btn btn-primary ml-2" (click)="reload()">Refresh Table</button> -->
+                                                </div><br />
               <div *ngIf="loading" class="text-center" id="loadingDiv">
                 <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
               </div>
@@ -64,6 +71,7 @@
                     <th style="display:none;">PROGRESSIVE</th>
                     <th style="display:none;">CUTOFF_DAY</th>
                     <th style="display:none;">WORKFLOW_DAY</th>
+                    <th style="display:none;">KPI_CATEGORY</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -108,6 +116,7 @@
                     <td style="display:none;">{{row.progressive}}</td>
                     <td style="display:none;">{{row.day_cutoff}}</td>
                     <td style="display:none;">{{row.day_workflow}}</td>
+                    <td style="display:none;">{{row.kpi_category}}</td>
                   </tr>
                 </tbody>
             </table>
@@ -121,14 +130,16 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
 
-        <div class="modal-header" >
+        <div class="modal-header">
           <!--        <h5 class="modal-title" id="approveModalLabel">Giustificativo</h5>-->
           <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideReferentiModal()">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        
-        <div class="modal-body" >
+        <div *ngIf="modalLoading" class="text-center" id="loadingMod">
+          <span class="fa fa-spinner text-primary fa-spin fa-3x"></span>
+        </div>
+        <div class="modal-body" *ngIf="!modalLoading">
           <div class="table-responsive" style="background: #ffffff; padding: 10px">
             <table id="classTable" class="table stripe">
               <thead class="thead-light2">

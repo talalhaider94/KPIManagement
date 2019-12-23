@@ -49,6 +49,7 @@ export class LandingPageComponent implements OnInit {
     yearVar: any;
     contractName: any;
     count = 0;
+    isSave;
     setViewAll = 0;
     gridLength = 0;
     thresholdkey = '@thresholdKey';
@@ -90,7 +91,7 @@ export class LandingPageComponent implements OnInit {
 
         this.thresholdvalue = 0;
         this.month = moment().format('MMMM');
-        this.selectedMonth?this.monthVar = this.selectedMonth:this.monthVar = moment().format('MM');
+        this.selectedMonth?this.monthVar = this.selectedMonth:this.monthVar = moment().subtract(1, 'month').format('MM');
         this.yearVar = moment().format('YYYY');
         this.getAnno();
         console.log(this.globalvar.getSelectedmonth(),'global selected month')
@@ -118,7 +119,11 @@ export class LandingPageComponent implements OnInit {
                 }
             }
             console.log("orignalArray -->", this.orignalArray);
-
+            if(localStorage.getItem("contracti")){
+                this.contractName = localStorage.getItem("contracti").split(',')
+                console.log(this.contractName)
+                this.customFilter();
+            }
             console.log("gridsData -> ", this.gridsData, this.limitedData);
             this.loading = false;
         },error =>{
@@ -178,7 +183,7 @@ export class LandingPageComponent implements OnInit {
             },
             destroy:true
         };
-
+        
         this.apiService.getThresholdDetails(this.thresholdkey1).subscribe((data: any) => {
             this.thresholdvalue1 = data;
             let split = this.thresholdvalue1.split(",");
@@ -232,20 +237,22 @@ export class LandingPageComponent implements OnInit {
             this.apiService.getLandingPage(this.monthVar, this.yearVar).subscribe((data: any) => {
                 this.gridsData = data;
                 this.gridLength = this.gridsData.length;
-              this.contName = this.gridsData;
-              this.myStyle.height = ((this.contName.length + 2) * 20) + 'px';
+                this.contName = this.gridsData;
+                this.myStyle.height = ((this.contName.length + 2) * 20) + 'px';
                 if(this.gridsData.length==0){
                     this.toastr.error("Nessun contraente assegnato all'utente");
                     this.loading = false;
                 }else{
                     this.gridLength = this.gridsData.length;
                     if(this.gridsData.length>6){
-                      this.limitedData = this.gridsData.splice(0,6);
+                      //this.limitedData = this.gridsData.splice(0,6);
+                      this.limitedData = this.contName;
                       this.contName = this.limitedData;
                       this.myStyle.height = ((this.contName.length + 2) * 20) + 'px';
                       this.orignalArray = [...this.limitedData, ...this.gridsData]
                     }else{
-                      this.limitedData = this.gridsData;
+                      //this.limitedData = this.gridsData;
+                      this.limitedData = this.contName;
                       this.orignalArray = this.gridsData;
                       this.contName = this.limitedData;
                       this.myStyle.height = ((this.contName.length + 2) * 20) + 'px';
@@ -264,10 +271,12 @@ export class LandingPageComponent implements OnInit {
         let value:any = this.contractName;
         this.thresholdvalue1 = this.contractName;
         this.thresholdLength=this.thresholdvalue1.length;
-
+        
         console.log(this.contractName);
         if(value == 'ALL'){
             this.loading = true;
+            this.isSave = false;
+            localStorage.removeItem("contracti");
             if(this.setViewAll == 0){
                 this.limitedData = this.contName
             }else{
@@ -277,6 +286,7 @@ export class LandingPageComponent implements OnInit {
             //this.gridsData = this.contName;
             this.loading = false;
         }else{
+            this.isSave = true;
             this.loading = true;
         var temp:any = this.contName
         var temp2:any = [];
@@ -311,7 +321,10 @@ export class LandingPageComponent implements OnInit {
         }
 
      }
-
+     saveConfiguration(){
+        localStorage.setItem("contracti", this.contractName);
+        localStorage.getItem("contracti").split(',');
+     }
      async customFilter1(data){
 
         let value:any = this.contractName;

@@ -12,33 +12,38 @@
                                 <form *ngIf="checkSiteminder == false" [formGroup]="loginForm" (ngSubmit)="onLoginFormSubmit()">
                                   <img src="../../../assets/img/brand/poste-italiane.png" style="height: 30px;text-align:center;margin-bottom: 20px;" />
                                     <br>
-                                    <div class="input-group mb-3">
+                                    <div *ngIf="browserSupported">
+                                      <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="icon-user"></i></span>
+                                          <span class="input-group-text"><i class="icon-user"></i></span>
                                         </div>
                                         <input type="text" formControlName="userName" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.userName.errors }" placeholder="Username" autocomplete="userName">
-                                    </div>
-                                    <!-- display username error -->
-                                    <span class="text-danger mb-3" *ngIf="submitted && f.userName.errors && f.userName.errors.required">Username obbligatorio</span>
-                                    <div class="input-group mb-3">
+                                      </div>
+                                      <!-- display username error -->
+                                      <span class="text-danger mb-3" *ngIf="submitted && f.userName.errors && f.userName.errors.required">Username obbligatorio</span>
+                                      <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="icon-lock"></i></span>
+                                          <span class="input-group-text"><i class="icon-lock"></i></span>
                                         </div>
                                         <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" placeholder="Password" autocomplete="current-password">
-                                    </div>
-                                    <!-- display password error -->
-                                    <span class="text-danger mb-3" *ngIf="submitted && f.password.errors && f.password.errors.required">Password obbligatoria</span>
-                                    <span class="text-danger mb-3" *ngIf="submitted && f.password.errors && f.password.errors.minlength">La Password deve essere di almeno 4 caratteri</span>
-                                    <div class="row">
+                                      </div>
+                                      <!-- display password error -->
+                                      <span class="text-danger mb-3" *ngIf="submitted && f.password.errors && f.password.errors.required">Password obbligatoria</span>
+                                      <span class="text-danger mb-3" *ngIf="submitted && f.password.errors && f.password.errors.minlength">La Password deve essere di almeno 4 caratteri</span>
+                                      <div class="row">
                                         <div class="col-6">
-                                            <button [disabled]="loading" type="submit" class="btn btn-primary px-4">
-                                                <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Login
-                                            </button>
+                                          <button [disabled]="loading" type="submit" class="btn btn-primary px-4">
+                                            <span *ngIf="loading" class="fa fa-spinner fa-spin"></span> Login
+                                          </button>
                                         </div>
                                         <div class="col-6 text-right">
-                                            <a routerLink="/forget" class="btn btn-link px-0">Password dimenticata?</a>
+                                          <a routerLink="/forget" class="btn btn-link px-0">Password dimenticata?</a>
                                         </div>
+                                      </div>
                                     </div>
+                                  <div *ngIf="!browserSupported">
+                                    <h4 style="color:red">Attenzione: il browser in uso non è supportato. Si prega di utilizzare Chrome.</h4>
+                                  </div>
                                 </form>
                             </div>
                         </div>
