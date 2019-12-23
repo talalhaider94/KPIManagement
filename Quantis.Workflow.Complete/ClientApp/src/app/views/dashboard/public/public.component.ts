@@ -25,12 +25,15 @@ import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as moment from 'moment';
 import { chartExportTranslations,getDistinctArray } from '../../../_helpers';
 import * as Highcharts from 'highcharts';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 
 @Component({
 	selector: 'app-public',
 	templateUrl: './public.component.html',
 	styleUrls: ['./public.component.scss']
 })
+
 export class PublicComponent implements OnInit {
 	widgetCollection: WidgetModel[];
 	options: GridsterConfig;

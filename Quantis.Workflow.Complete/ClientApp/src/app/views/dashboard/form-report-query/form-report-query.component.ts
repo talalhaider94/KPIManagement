@@ -195,7 +195,7 @@ export class FormReportQueryComponent implements OnInit {
       console.log('Debug Result -> ',data);
       if(this.debugResult.length==0){
         //this.toastr.error('Errore in query execution', 'Error');
-        this.debugResult = [{Error: 'No data found'}]
+        this.debugResult = [{'Nessun Dato trovato': 'Nessun Dato'}]
         this.debugQueryData = Object.keys(this.debugResult[0]);
       }else{
         ////////////// Setting Key ///////////////

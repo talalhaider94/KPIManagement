@@ -39,7 +39,6 @@
                 <option>ALL</option>
                 <option *ngFor = "let row of contName">{{row.contractname}}</option>
             </select>
-            <button *ngIf="isSave" type="button" class="btn btn-success ml-1" (click)="saveConfiguration()">Save</button>
             <div style='height:80%'><button class="btn btn-primary ml-1" (click)="showThresholdModal()"><i class="icon-settings"></i></button></div>
             <button type="button" class="btn btn-success float-right ml-1" (click)="viewAll()">Tutti</button>
             <button type="button" class="btn btn-danger float-right ml-2" (click)="gotTOlandingPage()">Indietro</button>
@@ -472,7 +471,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" data-dismiss="modal" (click)="setThreshold()">Salva</button>
                 <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="hideThresholdModal()">Chiudi</button> -->
-            </div>  
+            </div>
         </div>
     </div>
 </div>
@@ -488,9 +487,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <table class="table stripe" #CompliantTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+                <!-- <button class="ml-2" #btnExporta>Esporta CSV</button><br> -->
+                <table class="table stripe CompliantTable" #CompliantTable datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
                     <thead class="thead-light2">
                         <tr style="font-size:12px;color:white">
+                            
+                            
                             <th style="text-align:center">Contraente</th>
                             <th style="text-align:center; width:20%">Contratto</th>
                             <th style="text-align:center; width:40%">KPI</th>
@@ -498,17 +500,22 @@
                             <th style="text-align:center">Target</th>
                             <th style="text-align:center">Operatore</th>
                             <th style="text-align:center">Unità</th>
+                            
+                            
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let row of KpiCompliants; index as i">
-                            <td style="text-align:center">{{contractpartyname}}</td>
-                            <td style="text-align:center; width:20%">{{selectedContract}}</td>
-                            <td style="width:40%">{{row.kpiname}}</td>
-                            <td style="text-align:center">{{row.value}}</td>
-                            <td style="text-align:center">{{row.target}}</td>
-                            <td style="text-align:center">{{row.operator}}</td>
-                            <td style="text-align:center">{{row.unit}}</td>
+                            <tr *ngFor="let row of KpiCompliants; index as i">
+                                
+                                <td style="text-align:center">{{contractpartyname}}</td>
+                                <td style="text-align:center; width:20%">{{selectedContract}}</td>
+                                <td style="width:40%">{{row.kpiname}}</td>
+                                <td style="text-align:center">{{row.value}}</td>
+                                <td style="text-align:center">{{row.target}}</td>
+                                <td style="text-align:center">{{row.operator}}</td>
+                                <td style="text-align:center">{{row.unit}}</td>
+                                
+                                
                         </tr>
                     </tbody>
                 </table>

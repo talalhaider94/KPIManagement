@@ -111,11 +111,9 @@ export class DashboardListsComponent implements OnInit {
     }
 
     getFormatDate(date){
-        return this.dateTime.convertUtcToDateTimeIT(date)
+        return this.dateTime.convertUtcToDateTime(date)
     }
-  getFormatDateYYYY(date) {
-    return this.dateTime.convertUtcToDateTimeYYYY(date)
-  }
+
     createDashboard() {
         let loggedInUser = this.authService.currentUserValue;
         this.createDashboardForm.patchValue({

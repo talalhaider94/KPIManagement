@@ -33,17 +33,13 @@ export class LandingPageDetailsComponent implements OnInit {
     datatableElements: QueryList<DataTableDirective>;
     queryParams;
 
-    dtOptions: any = {
+    dtOptions: DataTables.Settings = {
         pagingType: 'full_numbers',
         pageLength: 10,
         dom: 'Bfrtip',
-        buttons: [
-            { extend: 'copy', text: 'Copia' },
-            { extend: 'excel', text: 'Excel' },
-            { extend: 'csv', text: 'CSV' },
-            { extend: 'pdf', text: 'PDF' },
-            { extend: 'print', text: 'Stampa' },
-        ],
+        /*buttons: [
+            'excel',
+        ],*/
         language: {
             processing: "Elaborazione...",
             search: "Cerca:",
@@ -64,21 +60,17 @@ export class LandingPageDetailsComponent implements OnInit {
             aria: {
                 sortAscending: ": attiva per ordinare la colonna in ordine crescente",
                 sortDescending: ":attiva per ordinare la colonna in ordine decrescente"
-            },
+            }
         },
         destroy:true
     };
-    dtOptions2:any = {
+    dtOptions2:DataTables.Settings = {
         pagingType: 'full_numbers',
         pageLength: 10,
         dom: 'Bfrtip',
-        buttons: [
-            { extend: 'copy', text: 'Copia' },
-            { extend: 'excel', text: 'Excel' },
-            { extend: 'csv', text: 'CSV' },
-            { extend: 'pdf', text: 'PDF' },
-            { extend: 'print', text: 'Stampa' },
-        ],
+        /*buttons: [
+            'excel',
+        ],*/
         language: {
             processing: "Elaborazione...",
             search: "Cerca:",
@@ -121,7 +113,6 @@ export class LandingPageDetailsComponent implements OnInit {
     contractpartyname: any;
     showMultiSelect  : boolean =false;
     count = 0;
-    isSave;
     setViewAll = 0;
     thresholdkey = '@thresholdKey1';
     thresholdvalue = 0;
@@ -178,11 +169,6 @@ export class LandingPageDetailsComponent implements OnInit {
                     this.orignalArray = this.gridsData;
                     this.contName = this.limitedData;
                 }
-            }
-            if(localStorage.getItem("contracti-details")){
-                this.contractName = localStorage.getItem("contracti-details").split(',')
-                console.log(this.contractName)
-                this.customFilter();
             }
             console.log("orignalArray -->", this.orignalArray);
             console.log("Level1 Data -> ", this.gridsData, this.limitedData,this.gridLength);
@@ -278,8 +264,6 @@ export class LandingPageDetailsComponent implements OnInit {
         let value:any = this.contractName;
         if(value == 'ALL'){
             this.loading = true;
-            this.isSave = false;
-            localStorage.removeItem("contracti-details");
             if(this.setViewAll == 0){
               this.limitedData = this.contName
             }else{
@@ -288,7 +272,6 @@ export class LandingPageDetailsComponent implements OnInit {
             this.loading = false;
         }else{
             this.loading = true;
-            this.isSave = true;
             var temp:any = this.contName
             var temp2:any = [];
             await value.forEach(async element => {
@@ -321,10 +304,7 @@ export class LandingPageDetailsComponent implements OnInit {
         }
      }
 
-     saveConfiguration(){
-        localStorage.setItem("contracti-details", this.contractName);
-        localStorage.getItem("contracti-details").split(',');
-     }
+
      async customFilter1(data){
 
         let value:any = this.contractName;
