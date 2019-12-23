@@ -17,7 +17,6 @@
                             [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
                             <thead class="thead-light2">
                                 <tr>
-                                    <th>No.</th>
                                     <th>Nome</th>
                                     <th>Data di Creazione</th>
                                     <th>Data di Modifica</th>
@@ -28,40 +27,39 @@
                                 <!-- <tr *ngIf="dashboards && dashboards.length === 0">
                                     <td colspan="5">Dashboard non trovata.</td>
                                 </tr> -->
-                                <tr *ngFor="let dashboard of dashboards; let i = index">
-                                    <td>{{ i+1 }}</td>
-                                    <td>{{ dashboard.name }}</td>
-                                    <td>{{ getFormatDate(dashboard.createdon)}}</td>
-                                    <td>{{ getFormatDate(dashboard.modifiedon)}}</td>
-                                    <td>
-                                        <button *ngIf="dashboard.isactive && dashboard.id==-1"
-                                            [routerLink]="['/dashboard/landingpage']" class="btn btn-sm btn-primary">
-                                            <i class="fa fa-eye"></i>
-                                        </button>
-                                        <button *ngIf="dashboard.isactive && dashboard.id!=-1"
-                                            [routerLink]="['/dashboard/public', dashboard.id]"
-                                            class="btn btn-sm btn-primary">
-                                            <i class="fa fa-eye"></i>
-                                        </button>
-                                        <button *ngIf="dashboard.isactive && dashboard.id!=-1"
-                                            [routerLink]="['/dashboard/dashboard', dashboard.id]"
-                                            class="btn btn-sm btn-success">
-                                            <i class="fa fa-edit"></i>
-                                        </button>
-                                        <button *ngIf="dashboard.id!=-1"
-                                            [ngClass]="dashboard.isactive ? '' : 'text-danger'"
-                                            class="btn btn-sm btn-dark"
-                                            (click)="dashboardStatus(dashboard.id, dashboard.isactive)">
-                                            <i class="fa fa-power-off"></i>
-                                        </button>
-                                        <button *ngIf="!dashboard.isactive && dashboard.id!=-1"
-                                            [ngClass]="dashboard.isactive ? '' : 'text-white'"
-                                            class="btn btn-sm btn-danger"
-                                            (click)="deleteDashboard(dashboard.id, dashboard.isactive)">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                              <tr *ngFor="let dashboard of dashboards; let i = index">
+                                <td>{{ dashboard.name }}</td>
+                                <td><span style="display:none">{{ getFormatDateYYYY(dashboard.createdon) }}</span>{{ getFormatDate(dashboard.createdon) }}</td>
+                                <td><span style="display:none">{{ getFormatDateYYYY(dashboard.modifiedon) }}</span>{{ getFormatDate(dashboard.modifiedon) }}</td>
+                                <td>
+                                  <button *ngIf="dashboard.isactive && dashboard.id==-1"
+                                          [routerLink]="['/dashboard/landingpage']" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-eye"></i>
+                                  </button>
+                                  <button *ngIf="dashboard.isactive && dashboard.id!=-1"
+                                          [routerLink]="['/dashboard/public', dashboard.id]"
+                                          class="btn btn-sm btn-primary">
+                                    <i class="fa fa-eye"></i>
+                                  </button>
+                                  <button *ngIf="dashboard.isactive && dashboard.id!=-1"
+                                          [routerLink]="['/dashboard/dashboard', dashboard.id]"
+                                          class="btn btn-sm btn-success">
+                                    <i class="fa fa-edit"></i>
+                                  </button>
+                                  <button *ngIf="dashboard.id!=-1"
+                                          [ngClass]="dashboard.isactive ? '' : 'text-danger'"
+                                          class="btn btn-sm btn-dark"
+                                          (click)="dashboardStatus(dashboard.id, dashboard.isactive)">
+                                    <i class="fa fa-power-off"></i>
+                                  </button>
+                                  <button *ngIf="!dashboard.isactive && dashboard.id!=-1"
+                                          [ngClass]="dashboard.isactive ? '' : 'text-white'"
+                                          class="btn btn-sm btn-danger"
+                                          (click)="deleteDashboard(dashboard.id, dashboard.isactive)">
+                                    <i class="fa fa-trash"></i>
+                                  </button>
+                                </td>
+                              </tr>
                             </tbody>
                         </table>
                     </div>

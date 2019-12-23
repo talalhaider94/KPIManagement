@@ -7,7 +7,7 @@
         </h4>
         <!-- <br> -->
         <!-- <h4 style="color:#565656;">Periodo:</h4> -->
-        <div class="row pull-right col-md-5" style="margin-top:-30px">
+        <div class="row pull-right col-md-6" style="margin-top:-30px">
             <!-- <h2>
                 <small class="" style="margin-top: 9px;font-size: 19px; font-weight:500"><b>{{month}} {{yearVar}}</b></small>
             </h2> -->
@@ -36,6 +36,7 @@
                 <option>ALL</option>
                 <option *ngFor = "let row of contName">{{row.contractpartyname}}</option>
             </select>
+            <button *ngIf="isSave" type="button" class="btn btn-success ml-1" (click)="saveConfiguration()">Save</button>
             <!-- <div style='height:80%'><button [disabled]="thresholdLength==0" class="btn btn-success ml-1" (click)="setThreshold1()">Salva</button></div> -->
             <div style='height:80%'><button class="btn btn-primary ml-1" (click)="showThresholdModal()"><i class="icon-settings"></i></button></div>
             <button type="button" class="btn btn-success ml-1" (click)="viewAll()">Tutti</button>
@@ -53,7 +54,7 @@
             [ngClass]="{'box box-danger box-solid': row.noncomplaintkpis > thresholdvalue, 'box box-success box-solid': row.noncomplaintkpis < thresholdvalue }"-->
             <section *ngFor="let row of limitedData; index as i" class="col-lg-3 connectedSortable">
                 <br>
-                <div [ngClass]="(((row.noncomplaintkpis/(row.noncomplaintkpis + row.complaintkpis))*100) >= thresholdvalue)?'box box-danger box-solid':'box box-success box-solid'">
+                <div [ngClass]="(((row.noncomplaintkpis/(row.totalkpis))*100) >= thresholdvalue)?'box box-danger box-solid':'box box-success box-solid'">
                     <div class="box-header with-border">
                         <h3 class="box-title"><a (click)="details(row.contractpartyid,row.contractpartyname)">{{row.contractpartyname}}</a></h3>
                         <!-- /.box-tools -->
@@ -185,7 +186,7 @@
             [ngClass]="{'box box-danger box-solid': row.noncomplaintkpis > thresholdvalue, 'box box-success box-solid': row.noncomplaintkpis < thresholdvalue }"-->
             <section *ngFor="let row of orignalArray; index as i" class="col-lg-3 connectedSortable">
                 <br>
-                <div [ngClass]="(((row.noncomplaintkpis/(row.noncomplaintkpis + row.complaintkpis))*100) >= thresholdvalue)?'box box-danger box-solid':'box box-success box-solid'">
+                <div [ngClass]="(((row.noncomplaintkpis/(row.totalkpis))*100) >= thresholdvalue)?'box box-danger box-solid':'box box-success box-solid'">
                     <div class="box-header with-border">
                         <h3 class="box-title"><a (click)="details(row.contractpartyid,row.contractpartyname)">{{row.contractpartyname}}</a></h3>
                         <!-- /.box-tools -->

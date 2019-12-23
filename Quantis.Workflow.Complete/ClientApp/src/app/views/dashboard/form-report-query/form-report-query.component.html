@@ -48,12 +48,12 @@
         <div [hidden]="hideData==1" class="table-responsive">
             <br />
             <table class="table stripe" #ConfigurationTable>
-                <thead class="text-center thead-light2">
+                <thead class="thead-light2">
                 <tr style="font-size:12px;color:white">
                     <th *ngFor="let key of debugQueryData">{{key}}</th>
                 </tr>
                 </thead>
-                <tbody class="text-center">
+                <tbody>
                     <tr *ngFor="let value of debugResult">
                         <td *ngFor="let key of debugQueryData; index as i"><div [innerHTML]="value[key]"></div></td>
                     </tr>

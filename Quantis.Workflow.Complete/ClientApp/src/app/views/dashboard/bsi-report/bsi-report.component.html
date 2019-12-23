@@ -30,7 +30,7 @@
         <td style="padding:unset;vertical-align: middle;">{{row.foldername}}</td>
         <td style="padding:unset;vertical-align: middle;width:40%">{{row.itemname}}</td>
         <td style="padding:unset;vertical-align: middle;">{{row.reporttype}}</td>
-        <td style="padding:unset;vertical-align: middle;">{{row.modifieddate | date:'MM/dd/yyyy, hh:mm a'}}</td>
+        <td style="padding:unset;vertical-align: middle;"><span style="display:none">{{row.modifieddate | date:'yyyy/MM/dd HH:mm:ss'}}</span>{{row.modifieddate | date:'dd/MM/yyyy, HH:mm:ss'}}</td>
         <td style="padding:unset;vertical-align: middle;">
           <a class="btn btn-primary btn-sm pointer-cursor" (click)="getReportDetails(row.itemid)"
           style="margin:2px">

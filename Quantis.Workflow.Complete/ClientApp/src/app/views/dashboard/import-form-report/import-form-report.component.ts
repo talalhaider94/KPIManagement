@@ -25,6 +25,8 @@ export class ImportFormReportComponent implements OnInit {
         QueryName: '',
         QueryText: '',
         OwnerId: '',
+        foldername: '',
+        folderownername: '',
         Parameters: []
     }
     withParameters: [{
@@ -114,6 +116,8 @@ export class ImportFormReportComponent implements OnInit {
         this.queryData.QueryName = row.reportname;
         this.queryData.QueryText = row.query;
         this.queryData.OwnerId = row.ownerid;
+        this.queryData.foldername = row.foldername;
+        this.queryData.folderownername = row.folderownername;
         console.log('parameters length -> ',row.parameters.length);
         if(row.parameters.length==0){ 
         }else{
